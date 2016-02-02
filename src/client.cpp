@@ -26,6 +26,8 @@
 #include <platform/util/util.h>
 #include <kodi/libKODI_guilib.h>
 
+#include "OctonetData.h"
+
 using namespace ADDON;
 
 /* setting variables with defaults */
@@ -35,6 +37,8 @@ std::string octonetAddress = "";
 ADDON_STATUS addonStatus = ADDON_STATUS_UNKNOWN;
 CHelper_libXBMC_addon *kodi = NULL;
 CHelper_libXBMC_pvr *pvr = NULL;
+
+OctonetData *data = NULL;
 
 /* KODI Core Addon functions
  * see xbmc_addon_dll.h */
@@ -71,6 +75,8 @@ ADDON_STATUS ADDON_Create(void *callbacks, void* props)
 
 	kodi->Log(LOG_DEBUG, "%s: Creating octonet pvr addon", __func__);
 	ADDON_ReadSettings();
+
+	data = new OctonetData;
 
 	addonStatus = ADDON_STATUS_OK;
 	return addonStatus;
@@ -177,42 +183,12 @@ PVR_ERROR OpenDialogChannelScan(void) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 int GetChannelsAmount(void)
 {
-	// FIXME: This is a dummy
-	return 2;
+	return data->getChannelCount();
 }
 
 PVR_ERROR GetChannels(ADDON_HANDLE handle, bool bRadio)
 {
-	// FIXME: This is a dummy
-	if (!bRadio) {
-		PVR_CHANNEL chan;
-		memset(&chan, 0, sizeof(PVR_CHANNEL));
-
-		chan.iUniqueId = 1;
-		chan.bIsRadio = bRadio;
-		chan.iChannelNumber = 1;
-		snprintf(chan.strChannelName, sizeof(chan.strChannelName) - 1,
-				"Das Erste");
-		snprintf(chan.strStreamURL, sizeof(chan.strStreamURL) - 1,
-				"rtsp://172.27.1.40:8554/channel/1");
-
-		pvr->TransferChannelEntry(handle, &chan);
-	} else {
-		PVR_CHANNEL chan;
-		memset(&chan, 0, sizeof(PVR_CHANNEL));
-
-		chan.iUniqueId = 2;
-		chan.bIsRadio = bRadio;
-		chan.iChannelNumber = 2;
-		snprintf(chan.strChannelName, sizeof(chan.strChannelName) - 1,
-				"NDR 2");
-		snprintf(chan.strStreamURL, sizeof(chan.strStreamURL) - 1,
-				"rtsp://172.27.1.40:8554/channel/10");
-
-		pvr->TransferChannelEntry(handle, &chan);
-	}
-
-	return PVR_ERROR_NO_ERROR;
+	return data->getChannels(handle, bRadio);
 }
 
 PVR_ERROR DeleteChannel(const PVR_CHANNEL& channel) { return PVR_ERROR_NOT_IMPLEMENTED; }

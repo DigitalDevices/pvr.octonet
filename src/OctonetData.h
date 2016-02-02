@@ -36,6 +36,13 @@ struct OctonetChannel
 	int id;
 };
 
+struct OctonetGroup
+{
+	std::string name;
+	bool radio;
+	std::vector<int> members;
+};
+
 class OctonetData : public PLATFORM::CThread
 {
 	public:
@@ -45,12 +52,18 @@ class OctonetData : public PLATFORM::CThread
 		virtual int getChannelCount(void);
 		virtual PVR_ERROR getChannels(ADDON_HANDLE handle, bool bRadio);
 
+		virtual int getGroupCount(void);
+		virtual PVR_ERROR getGroups(ADDON_HANDLE handle, bool bRadio);
+		virtual PVR_ERROR getGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
+
 	protected:
 		virtual bool loadChannelList(void);
+		virtual OctonetGroup* findGroup(const std::string &name);
 
 		virtual void *Process(void);
 
 	private:
 		std::string serverAddress;
 		std::vector<OctonetChannel> channels;
+		std::vector<OctonetGroup> groups;
 };

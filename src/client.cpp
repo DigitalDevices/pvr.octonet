@@ -148,6 +148,7 @@ PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES *pCapabilities)
 {
 	pCapabilities->bSupportsTV = true;
 	pCapabilities->bSupportsRadio = true;
+	pCapabilities->bSupportsChannelGroups = true;
 
 	return PVR_ERROR_NO_ERROR;
 }
@@ -174,9 +175,20 @@ PVR_ERROR CallMenuHook(const PVR_MENUHOOK& menuhook, const PVR_MENUHOOK_DATA &it
 PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 /* Channel groups */
-int GetChannelGroupsAmount(void) { return -1; }
-PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP& group) { return PVR_ERROR_NOT_IMPLEMENTED; }
+int GetChannelGroupsAmount(void)
+{
+	return data->getGroupCount();
+}
+
+PVR_ERROR GetChannelGroups(ADDON_HANDLE handle, bool bRadio)
+{
+	return data->getGroups(handle, bRadio);
+}
+
+PVR_ERROR GetChannelGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP& group)
+{
+	return data->getGroupMembers(handle, group);
+}
 
 /* Channels */
 PVR_ERROR OpenDialogChannelScan(void) { return PVR_ERROR_NOT_IMPLEMENTED; }

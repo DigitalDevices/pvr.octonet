@@ -34,6 +34,7 @@ OctonetData::OctonetData()
 {
 	serverAddress = octonetAddress;
 	channels.clear();
+	groups.clear();
 
 	if (loadChannelList())
 		kodi->QueueNotification(QUEUE_INFO, "%d channels loaded.", channels.size());
@@ -42,6 +43,7 @@ OctonetData::OctonetData()
 OctonetData::~OctonetData(void)
 {
 	channels.clear();
+	groups.clear();
 }
 
 bool OctonetData::loadChannelList()
@@ -66,13 +68,18 @@ bool OctonetData::loadChannelList()
 	const Json::Value groupList = root["GroupList"];
 	for (unsigned int i = 0; i < groupList.size(); i++) {
 		const Json::Value channelList = groupList[i]["ChannelList"];
+		OctonetGroup group;
+
+		group.name = groupList[i]["Title"].asString();
+		group.radio = group.name.compare(0, 5, "Radio") ? false : true;
+
 		for (unsigned int j = 0; j < channelList.size(); j++) {
 			const Json::Value channel = channelList[j];
 			OctonetChannel chan;
 
 			chan.name = channel["Title"].asString();
 			chan.url = "rtsp://" + serverAddress + "/" + channel["Request"].asString();
-			chan.radio = false;
+			chan.radio = group.radio;
 
 #if 0 /* Would require a 64 bit identifier */
 			std::string id = channel["ID"].asString();
@@ -85,8 +92,10 @@ bool OctonetData::loadChannelList()
 			ids >> chan.id;
 #endif
 			chan.id = 1000 + channels.size();
+			group.members.push_back(channels.size());
 			channels.push_back(chan);
 		}
+		groups.push_back(group);
 	}
 
 	return true;
@@ -124,4 +133,63 @@ PVR_ERROR OctonetData::getChannels(ADDON_HANDLE handle, bool bRadio)
 		}
 	}
 	return PVR_ERROR_NO_ERROR;
+}
+
+int OctonetData::getGroupCount(void)
+{
+	return groups.size();
+}
+
+PVR_ERROR OctonetData::getGroups(ADDON_HANDLE handle, bool bRadio)
+{
+	for (unsigned int i = 0; i < groups.size(); i++)
+	{
+		OctonetGroup &group = groups.at(i);
+		if (group.radio == bRadio)
+		{
+			PVR_CHANNEL_GROUP g;
+			memset(&g, 0, sizeof(PVR_CHANNEL_GROUP));
+
+			g.iPosition = 0;
+			g.bIsRadio = group.radio;
+			strncpy(g.strGroupName, group.name.c_str(), strlen(group.name.c_str()));
+
+			pvr->TransferChannelGroup(handle, &g);
+		}
+	}
+
+	return PVR_ERROR_NO_ERROR;
+}
+
+PVR_ERROR OctonetData::getGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group)
+{
+	OctonetGroup *g = findGroup(group.strGroupName);
+	if (g == NULL)
+		return PVR_ERROR_UNKNOWN;
+
+	for (unsigned int i = 0; i < g->members.size(); i++)
+	{
+		OctonetChannel &channel = channels.at(g->members[i]);
+		PVR_CHANNEL_GROUP_MEMBER m;
+		memset(&m, 0, sizeof(PVR_CHANNEL_GROUP_MEMBER));
+
+		strncpy(m.strGroupName, group.strGroupName, strlen(group.strGroupName));
+		m.iChannelUniqueId = channel.id;
+		m.iChannelNumber = channel.id;
+
+		pvr->TransferChannelGroupMember(handle, &m);
+	}
+
+	return PVR_ERROR_NO_ERROR;
+}
+
+OctonetGroup* OctonetData::findGroup(const std::string &name)
+{
+	for (unsigned int i = 0; i < groups.size(); i++)
+	{
+		if (groups.at(i).name == name)
+			return &groups.at(i);
+	}
+
+	return NULL;
 }

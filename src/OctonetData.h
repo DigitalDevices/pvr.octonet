@@ -30,6 +30,7 @@
 
 struct OctonetChannel
 {
+	int64_t nativeId;
 	std::string name;
 	std::string url;
 	bool radio;

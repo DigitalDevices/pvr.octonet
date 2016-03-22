@@ -46,6 +46,20 @@ OctonetData::~OctonetData(void)
 	groups.clear();
 }
 
+int64_t OctonetData::parseID(std::string id)
+{
+	int64_t nativeId;
+	size_t strip;
+	/* Strip colons from id */
+	while ((strip = id.find(":")) != std::string::npos)
+		id.erase(strip, 1);
+
+	std::stringstream ids(id);
+	ids >> nativeId;
+
+	return nativeId;
+}
+
 bool OctonetData::loadChannelList()
 {
 	std::string jsonContent;
@@ -80,17 +94,8 @@ bool OctonetData::loadChannelList()
 			chan.name = channel["Title"].asString();
 			chan.url = "rtsp://" + serverAddress + "/" + channel["Request"].asString();
 			chan.radio = group.radio;
+			chan.nativeId = parseID(channel["ID"].asString());
 
-#if 0 /* Would require a 64 bit identifier */
-			std::string id = channel["ID"].asString();
-			size_t strip;
-			/* Strip colons from id */
-			while ((strip = id.find(":")) != std::string::npos)
-				id.erase(strip, 1);
-
-			std::stringstream ids(id);
-			ids >> chan.id;
-#endif
 			chan.id = 1000 + channels.size();
 			group.members.push_back(channels.size());
 			channels.push_back(chan);

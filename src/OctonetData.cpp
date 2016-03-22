@@ -35,6 +35,7 @@ OctonetData::OctonetData()
 	serverAddress = octonetAddress;
 	channels.clear();
 	groups.clear();
+	lastEpgLoad = 0;
 
 	if (loadChannelList())
 		kodi->QueueNotification(QUEUE_INFO, "%d channels loaded.", channels.size());
@@ -106,6 +107,97 @@ bool OctonetData::loadChannelList()
 	return true;
 }
 
+OctonetChannel* OctonetData::findChannel(int64_t nativeId)
+{
+	std::vector<OctonetChannel>::iterator it;
+	for (it = channels.begin(); it < channels.end(); ++it) {
+		if (it->nativeId == nativeId)
+			return &*it;
+	}
+
+	return NULL;
+}
+
+time_t OctonetData::parseDateTime(std::string date)
+{
+	struct tm timeinfo;
+	time_t time;
+
+	memset(&timeinfo, 0, sizeof(timeinfo));
+
+	if (date.length() > 8) {
+		sscanf(date.c_str(), "%04d-%02d-%02dT%02d:%02d:%02dZ",
+				&timeinfo.tm_year, &timeinfo.tm_mon, &timeinfo.tm_mday,
+				&timeinfo.tm_hour, &timeinfo.tm_min, &timeinfo.tm_sec);
+		timeinfo.tm_mon -= 1;
+		timeinfo.tm_year -= 1900;
+	} else {
+		sscanf(date.c_str(), "%02d:%02d:%02d",
+				&timeinfo.tm_hour, &timeinfo.tm_min, &timeinfo.tm_sec);
+		timeinfo.tm_year = 70; // unix timestamps start 1970
+		timeinfo.tm_mday = 1;
+	}
+
+	timeinfo.tm_isdst = -1;
+
+	return timegm(&timeinfo);
+}
+
+bool OctonetData::loadEPG(void)
+{
+	/* Reload at most every 30 seconds */
+	if (lastEpgLoad + 30 > time(NULL))
+		return false;
+
+	std::string jsonContent;
+	void *f = kodi->OpenFile(("http://" + serverAddress + "/epg.lua?;#|encoding=gzip").c_str(), 0);
+	if (!f)
+		return false;
+
+	char buf[1024];
+	while (int read = kodi->ReadFile(f, buf, 1024))
+		jsonContent.append(buf, read);
+
+	kodi->CloseFile(f);
+
+	Json::Value root;
+	Json::Reader reader;
+
+	if (!reader.parse(jsonContent, root, false))
+		return false;
+
+	const Json::Value eventList = root["EventList"];
+	OctonetChannel *channel = NULL;
+	for (unsigned int i = 0; i < eventList.size(); i++) {
+		const Json::Value event = eventList[i];
+		OctonetEpgEntry entry;
+
+		entry.start = parseDateTime(event["Time"].asString());
+		entry.end = entry.start + parseDateTime(event["Duration"].asString());
+		entry.title = event["Name"].asString();
+		entry.subtitle = event["Text"].asString();
+		std::string channelId = event["ID"].asString();
+		std::string epgId = channelId.substr(channelId.rfind(":") + 1);
+		channelId = channelId.substr(0, channelId.rfind(":"));
+
+		entry.channelId = parseID(channelId);
+		entry.id = atoi(epgId.c_str());
+
+		if (channel == NULL || channel->nativeId != entry.channelId)
+			channel = findChannel(entry.channelId);
+
+		if (channel == NULL) {
+			kodi->Log(LOG_ERROR, "EPG for unknown channel.");
+			continue;
+		}
+
+		channel->epg.push_back(entry);
+	}
+
+	lastEpgLoad = time(NULL);
+	return true;
+}
+
 void *OctonetData::Process(void)
 {
 	return NULL;
@@ -137,6 +229,47 @@ PVR_ERROR OctonetData::getChannels(ADDON_HANDLE handle, bool bRadio)
 			pvr->TransferChannelEntry(handle, &chan);
 		}
 	}
+	return PVR_ERROR_NO_ERROR;
+}
+
+PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t start, time_t end)
+{
+	bool needs_reload = false;
+	for (unsigned int i = 0; i < channels.size(); i++)
+	{
+		OctonetChannel &chan = channels.at(i);
+		if (channel.iUniqueId != chan.id)
+			continue;
+
+		// FIXME: Check if reload is needed!?
+
+		std::vector<OctonetEpgEntry>::iterator it;
+		time_t last_end = 0;
+		for (it = chan.epg.begin(); it < chan.epg.end(); ++it) {
+			if (end > last_end)
+				last_end = end;
+
+			if (it->end < start || it->start > end) {
+				continue;
+			}
+
+			EPG_TAG entry;
+			memset(&entry, 0, sizeof(EPG_TAG));
+
+			entry.iChannelNumber = i;
+			entry.iUniqueBroadcastId = it->id;
+			entry.strTitle = it->title.c_str();
+			entry.strPlotOutline = it->subtitle.c_str();
+			entry.startTime = it->start;
+			entry.endTime = it->end;
+
+			pvr->TransferEpgEntry(handle, &entry);
+		}
+
+		if (last_end < end)
+			loadEPG();
+	}
+
 	return PVR_ERROR_NO_ERROR;
 }
 

@@ -28,6 +28,16 @@
 #include "platform/util/StdString.h"
 #include "client.h"
 
+struct OctonetEpgEntry
+{
+	int64_t channelId;
+	time_t start;
+	time_t end;
+	int id;
+	std::string title;
+	std::string subtitle;
+};
+
 struct OctonetChannel
 {
 	int64_t nativeId;
@@ -35,6 +45,8 @@ struct OctonetChannel
 	std::string url;
 	bool radio;
 	int id;
+
+	std::vector<OctonetEpgEntry> epg;
 };
 
 struct OctonetGroup
@@ -57,14 +69,23 @@ class OctonetData : public PLATFORM::CThread
 		virtual PVR_ERROR getGroups(ADDON_HANDLE handle, bool bRadio);
 		virtual PVR_ERROR getGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
 
+		virtual PVR_ERROR getEPG(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t start, time_t end);
+
 	protected:
 		virtual bool loadChannelList(void);
+		virtual bool loadEPG(void);
 		virtual OctonetGroup* findGroup(const std::string &name);
 
 		virtual void *Process(void);
+
+		OctonetChannel* findChannel(int64_t nativeId);
+		time_t parseDateTime(std::string date);
+		int64_t parseID(std::string id);
 
 	private:
 		std::string serverAddress;
 		std::vector<OctonetChannel> channels;
 		std::vector<OctonetGroup> groups;
+
+		time_t lastEpgLoad;
 };

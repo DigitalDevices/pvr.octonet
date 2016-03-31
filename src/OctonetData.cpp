@@ -28,6 +28,10 @@
 #include "OctonetData.h"
 #include "platform/util/StringUtils.h"
 
+#ifndef timegm
+#define timegm _mkgmtime
+#endif
+
 using namespace ADDON;
 
 OctonetData::OctonetData()

@@ -24,6 +24,10 @@
 #include "kodi/libXBMC_addon.h"
 #include "kodi/libXBMC_pvr.h"
 
+#ifndef __func__
+#define __func__ __FUNCTION__
+#endif
+
 extern ADDON::CHelper_libXBMC_addon *kodi;
 extern CHelper_libXBMC_pvr *pvr;
 

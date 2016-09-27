@@ -24,8 +24,8 @@
 
 #include <vector>
 
-#include "platform/threads/threads.h"
-#include "platform/util/StdString.h"
+#include "p8-platform/threads/threads.h"
+#include "p8-platform/util/StdString.h"
 #include "client.h"
 
 struct OctonetEpgEntry
@@ -56,7 +56,7 @@ struct OctonetGroup
 	std::vector<int> members;
 };
 
-class OctonetData : public PLATFORM::CThread
+class OctonetData : public P8PLATFORM::CThread
 {
 	public:
 		OctonetData(void);

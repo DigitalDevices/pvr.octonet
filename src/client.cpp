@@ -23,7 +23,7 @@
 #include "client.h"
 #include <kodi/xbmc_pvr_dll.h>
 #include <kodi/libXBMC_addon.h>
-#include <platform/util/util.h>
+#include <p8-platform/util/util.h>
 #include <kodi/libKODI_guilib.h>
 
 #include "OctonetData.h"
@@ -172,6 +172,19 @@ const char* GetConnectionString(void)
 PVR_ERROR GetDriveSpace(long long* iTotal, long long* iUsed) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR CallMenuHook(const PVR_MENUHOOK& menuhook, const PVR_MENUHOOK_DATA &item) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
+void OnSystemSleep() {
+	kodi->Log(LOG_INFO, "Received event: %s", __FUNCTION__);
+	// FIXME: Disconnect?
+}
+
+void OnSystemWake() {
+	kodi->Log(LOG_INFO, "Received event: %s", __FUNCTION__);
+	// FIXME:Reconnect?
+}
+
+void OnPowerSavingActivated() {}
+void OnPowerSavingDeactivated() {}
+
 /* EPG */
 PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)
 {
@@ -240,7 +253,7 @@ int ReadLiveStream(unsigned char* pBuffer, unsigned int iBufferSize) { return -1
 long long SeekLiveStream(long long iPosition, int iWhence) { return -1; }
 long long PositionLiveStream(void) { return -1; }
 long long LengthLiveStream(void) { return -1; }
-int GetCurrentClientChannel(void) { return -1; }
+bool IsRealTimeStream(void) { return true; }
 bool SwitchChannel(const PVR_CHANNEL& channel) { return false; }
 PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS& signalStatus) { return PVR_ERROR_NOT_IMPLEMENTED; }
 const char* GetLiveStreamURL(const PVR_CHANNEL& channel) { return NULL; }
@@ -271,6 +284,7 @@ bool CanSeekStream() { return false; }
 void PauseStream(bool bPaused) {}
 bool SeekTime(int time, bool backwards, double *startpts) { return false; }
 void SetSpeed(int speed) {}
+PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 time_t GetPlayingTime() { return 0; }
 time_t GetBufferTimeStart() { return 0; }

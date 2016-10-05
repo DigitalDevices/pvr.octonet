@@ -6,8 +6,29 @@
 #include "client.h"
 #include <p8-platform/util/util.h>
 #include <kodi/libXBMC_addon.h>
-// #include <iostream>
+#include <cstring>
 #include <sstream>
+
+#if defined(_WIN32) || defined(_WIN64)
+#define strtok_r strtok_s
+#define strncasecmp _strnicmp
+
+int vasprintf(char **sptr, char *fmt, va_list argv) {
+	int wanted = vsnprintf(*sptr = NULL, 0, fmt, argv);
+	if((wanted < 0) || ((*sptr = (char *)malloc(1 + wanted)) == NULL))
+		return -1;
+	return vsprintf(*sptr, fmt, argv);
+}
+
+int asprintf(char **sptr, char *fmt, ...) {
+	int retval;
+	va_list argv;
+	va_start(argv, fmt);
+	retval = vasprintf(sptr, fmt, argv);
+	va_end(argv);
+	return retval;
+}
+#endif
 
 #define RTSP_DEFAULT_PORT 554
 #define RTSP_RECEIVE_BUFFER 2048

@@ -28,4 +28,8 @@ set(OCTONET_SOURCES
 
 build_addon(pvr.octonet OCTONET DEPLIBS)
 
+if(WIN32)
+	target_link_libraries(pvr.octonet wsock32 ws2_32)
+endif()
+
 include(CPack)

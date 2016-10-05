@@ -226,7 +226,6 @@ PVR_ERROR OctonetData::getChannels(ADDON_HANDLE handle, bool bRadio)
 			chan.bIsRadio = channel.radio;
 			chan.iChannelNumber = i;
 			strncpy(chan.strChannelName, channel.name.c_str(), strlen(channel.name.c_str()));
-			strncpy(chan.strStreamURL, channel.url.c_str(), strlen(channel.url.c_str()));
 			strcpy(chan.strInputFormat, "video/x-mpegts");
 			chan.bIsHidden = false;
 

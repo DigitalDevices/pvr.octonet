@@ -27,6 +27,7 @@
 #include <kodi/libKODI_guilib.h>
 
 #include "OctonetData.h"
+#include "rtsp_client.hpp"
 
 using namespace ADDON;
 
@@ -247,14 +248,28 @@ PVR_ERROR UpdateTimer(const PVR_TIMER& timer) { return PVR_ERROR_NOT_IMPLEMENTED
 /* PVR stream handling */
 /* entirely unused, as we use standard RTSP+TS mux, which can be handlded by
  * Kodi core */
-bool OpenLiveStream(const PVR_CHANNEL& channel) { return false; }
-void CloseLiveStream(void) {}
-int ReadLiveStream(unsigned char* pBuffer, unsigned int iBufferSize) { return -1; }
+bool OpenLiveStream(const PVR_CHANNEL& channel) {
+	return rtsp_open(data->getUrl(channel.iUniqueId));
+}
+
+int ReadLiveStream(unsigned char* pBuffer, unsigned int iBufferSize) {
+	return rtsp_read(pBuffer, iBufferSize);
+}
+
+void CloseLiveStream(void) {
+	rtsp_close();
+}
+
 long long SeekLiveStream(long long iPosition, int iWhence) { return -1; }
 long long PositionLiveStream(void) { return -1; }
 long long LengthLiveStream(void) { return -1; }
 bool IsRealTimeStream(void) { return true; }
-bool SwitchChannel(const PVR_CHANNEL& channel) { return false; }
+
+bool SwitchChannel(const PVR_CHANNEL& channel) {
+	CloseLiveStream();
+	return OpenLiveStream(channel);
+}
+
 PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS& signalStatus) { return PVR_ERROR_NOT_IMPLEMENTED; }
 const char* GetLiveStreamURL(const PVR_CHANNEL& channel) { return NULL; }
 PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties) { return PVR_ERROR_NOT_IMPLEMENTED; }

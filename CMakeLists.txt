@@ -22,7 +22,9 @@ set(DEPLIBS
 
 set(OCTONET_SOURCES
 	src/OctonetData.cpp
-	src/client.cpp)
+	src/client.cpp
+	src/Socket.cpp
+	src/rtsp_client.cpp)
 
 build_addon(pvr.octonet OCTONET DEPLIBS)
 

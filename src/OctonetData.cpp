@@ -277,6 +277,16 @@ PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, const PVR_CHANNEL &channel, t
 	return PVR_ERROR_NO_ERROR;
 }
 
+const std::string& OctonetData::getUrl(int id) const {
+	for(std::vector<OctonetChannel>::const_iterator iter = channels.begin(); iter != channels.end(); ++iter) {
+		if(iter->id == id) {
+			return iter->url;
+		}
+	}
+
+	return channels[0].url;
+}
+
 int OctonetData::getGroupCount(void)
 {
 	return groups.size();

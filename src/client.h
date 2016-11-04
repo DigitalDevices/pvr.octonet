@@ -21,8 +21,8 @@
  *
  */
 
-#include "kodi/libXBMC_addon.h"
-#include "kodi/libXBMC_pvr.h"
+#include "libXBMC_addon.h"
+#include "libXBMC_pvr.h"
 
 #ifndef __func__
 #define __func__ __FUNCTION__

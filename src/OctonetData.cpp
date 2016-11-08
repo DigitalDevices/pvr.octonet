@@ -41,8 +41,8 @@ OctonetData::OctonetData()
 	groups.clear();
 	lastEpgLoad = 0;
 
-	if (loadChannelList())
-		kodi->QueueNotification(QUEUE_INFO, "%d channels loaded.", channels.size());
+	if (!loadChannelList())
+		kodi->QueueNotification(QUEUE_ERROR, kodi->GetLocalizedString(30001), channels.size());
 }
 
 OctonetData::~OctonetData(void)

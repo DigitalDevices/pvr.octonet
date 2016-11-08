@@ -19,3 +19,7 @@ msgstr ""
 msgctxt "#30000"
 msgid "Octonet Server Address"
 msgstr ""
+
+msgctxt "#30001"
+msgid "Could not load chanellist"
+msgstr ""

@@ -37,6 +37,7 @@ int asprintf(char **sptr, char *fmt, ...) {
 #define KEEPALIVE_INTERVAL 60
 #define KEEPALIVE_MARGIN 5
 #define UDP_ADDRESS_LEN 16
+#define RTCP_BUFFER_SIZE 1024
 
 using namespace std;
 using namespace ADDON;
@@ -66,12 +67,16 @@ struct rtsp_client {
 
 	Socket tcp_sock;
 	Socket udp_sock;
+	Socket rtcp_sock;
 
 	enum rtsp_state state;
 	int cseq;
 
 	size_t fifo_size;
 	uint16_t last_seq_nr;
+
+	int level;
+	int quality;
 };
 
 struct url {
@@ -79,6 +84,16 @@ struct url {
 	string host;
 	int port;
 	string path;
+};
+
+struct rtcp_app {
+	uint8_t subtype;
+	uint8_t pt;
+	uint16_t len;
+	uint32_t ssrc;
+	char name[4];
+	uint16_t identifier;
+	uint16_t string_len;
 };
 
 static rtsp_client *rtsp = NULL;
@@ -279,6 +294,9 @@ bool rtsp_open(const string& url_str)
 	if (rtsp == NULL)
 		return false;
 
+	rtsp->level = 0;
+	rtsp->quality = 0;
+
 	kodi->Log(LOG_DEBUG, "try to open '%s'", url_str.c_str());
 
 	url dst = parse_url(url_str);
@@ -342,6 +360,14 @@ bool rtsp_open(const string& url_str)
 		goto error;
 	}
 
+	rtsp->rtcp_sock = Socket(af_inet, pf_inet, sock_dgram, udp);
+	if(!rtsp->rtcp_sock.bind(rtsp->udp_port + 1)) {
+		goto error;
+	}
+	if(!rtsp->rtcp_sock.set_non_blocking(true)) {
+		goto error;
+	}
+
 	return true;
 
 error:
@@ -389,6 +415,7 @@ void rtsp_close()
 		rtsp_teardown();
 		rtsp->tcp_sock.close();
 		rtsp->udp_sock.close();
+		rtsp->rtcp_sock.close();
 		delete rtsp;
 		rtsp = NULL;
 	}

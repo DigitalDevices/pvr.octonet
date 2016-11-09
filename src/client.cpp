@@ -270,7 +270,11 @@ bool SwitchChannel(const PVR_CHANNEL& channel) {
 	return OpenLiveStream(channel);
 }
 
-PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS& signalStatus) { return PVR_ERROR_NOT_IMPLEMENTED; }
+PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS& signalStatus) {
+	rtsp_fill_signal_status(signalStatus);
+	return PVR_ERROR_NO_ERROR;
+}
+
 const char* GetLiveStreamURL(const PVR_CHANNEL& channel) { return NULL; }
 PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties) { return PVR_ERROR_NOT_IMPLEMENTED; }
 

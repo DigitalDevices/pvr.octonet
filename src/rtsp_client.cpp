@@ -468,3 +468,10 @@ void rtsp_close()
 		rtsp = NULL;
 	}
 }
+
+void rtsp_fill_signal_status(PVR_SIGNAL_STATUS& signal_status) {
+	if(rtsp) {
+		signal_status.iSNR = 0x1111 * rtsp->quality;
+		signal_status.iSignal = 0x101 * rtsp->level;
+	}
+}

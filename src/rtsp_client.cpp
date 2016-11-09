@@ -124,6 +124,16 @@ static url parse_url(const std::string& str) {
 	return result;
 }
 
+void split_string(const string& s, char delim, vector<string>& elems) {
+	stringstream ss;
+	ss.str(s);
+
+	string item;
+	while(getline(ss, item, delim)) {
+		elems.push_back(item);
+	}
+}
+
 static int tcp_sock_read_line(string &line) {
 	static string buf;
 
@@ -375,10 +385,48 @@ error:
 	return false;
 }
 
+static void parse_rtcp(const char *buf, int size) {
+	int offset = 0;
+	while(size > 4) {
+		const rtcp_app *app = reinterpret_cast<const rtcp_app *>(buf + offset);
+		uint16_t len = 4 * (ntohs(app->len) + 1);
+
+		if((app->pt != 204) || (memcmp(app->name, "SES1", 4) != 0)) {
+			size -= len;
+			offset += len;
+			continue;
+		}
+
+		uint16_t string_len = ntohs(app->string_len);
+		string app_data(&buf[offset + sizeof(rtcp_app)], string_len);
+
+		vector<string> elems;
+		split_string(app_data, ';', elems);
+		if(elems.size() != 4) {
+			return;
+		}
+
+		vector<string> tuner;
+		split_string(elems[2], ',', tuner);
+		if(tuner.size() < 4) {
+			return;
+		}
+
+		rtsp->level = atoi(tuner[1].c_str());
+		rtsp->quality = atoi(tuner[3].c_str());
+
+		return;
+	}
+}
+
 int rtsp_read(void *buf, unsigned buf_size) {
 	sockaddr addr;
 	socklen_t addr_len = sizeof(addr);
 	int ret = rtsp->udp_sock.recvfrom((char *)buf, buf_size, (sockaddr *)&addr, &addr_len);
+
+	char rtcp_buf[RTCP_BUFFER_SIZE];
+	int rtcp_len = rtsp->rtcp_sock.recvfrom(rtcp_buf, RTCP_BUFFER_SIZE, (sockaddr *)&addr, &addr_len);
+	parse_rtcp(rtcp_buf, rtcp_len);
 
 	// TODO: check ip
 

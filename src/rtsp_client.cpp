@@ -75,6 +75,7 @@ struct rtsp_client {
 	size_t fifo_size;
 	uint16_t last_seq_nr;
 
+	string name;
 	int level;
 	int quality;
 };
@@ -291,7 +292,7 @@ static enum rtsp_result rtsp_handle() {
 	return (enum rtsp_result)rtsp_result;
 }
 
-bool rtsp_open(const string& url_str)
+bool rtsp_open(const string& name, const string& url_str)
 {
 	string setup_url_str;
 	const char *psz_setup_url;
@@ -304,6 +305,7 @@ bool rtsp_open(const string& url_str)
 	if (rtsp == NULL)
 		return false;
 
+	rtsp->name = name;
 	rtsp->level = 0;
 	rtsp->quality = 0;
 
@@ -471,6 +473,7 @@ void rtsp_close()
 
 void rtsp_fill_signal_status(PVR_SIGNAL_STATUS& signal_status) {
 	if(rtsp) {
+		strncpy(signal_status.strServiceName, rtsp->name.c_str(), PVR_ADDON_NAME_STRING_LENGTH - 1);
 		signal_status.iSNR = 0x1111 * rtsp->quality;
 		signal_status.iSignal = 0x101 * rtsp->level;
 	}

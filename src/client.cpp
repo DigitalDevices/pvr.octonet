@@ -249,7 +249,7 @@ PVR_ERROR UpdateTimer(const PVR_TIMER& timer) { return PVR_ERROR_NOT_IMPLEMENTED
 /* entirely unused, as we use standard RTSP+TS mux, which can be handlded by
  * Kodi core */
 bool OpenLiveStream(const PVR_CHANNEL& channel) {
-	return rtsp_open(data->getUrl(channel.iUniqueId));
+	return rtsp_open(data->getName(channel.iUniqueId), data->getUrl(channel.iUniqueId));
 }
 
 int ReadLiveStream(unsigned char* pBuffer, unsigned int iBufferSize) {

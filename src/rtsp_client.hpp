@@ -4,7 +4,7 @@
 #include <string>
 #include <xbmc_pvr_types.h>
 
-bool rtsp_open(const std::string& url_str);
+bool rtsp_open(const std::string& name, const std::string& url_str);
 void rtsp_close();
 int rtsp_read(void *buf, unsigned buf_size);
 void rtsp_fill_signal_status(PVR_SIGNAL_STATUS& signal_status);

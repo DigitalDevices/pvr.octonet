@@ -1,7 +1,10 @@
 # Octonet PVR
 DigitalDevices [Octonet] (http://www.digital-devices.eu/shop/de/netzwerk-tv/) PVR client addon for [Kodi] (http://kodi.tv)
 
-[![Build Status](https://travis-ci.org/julianscheel/pvr.octonet.svg?branch=master)](https://travis-ci.org/julianscheel/pvr.octonet)
+| Platform | Status |
+|----------|--------|
+| Linux + OS X (Travis) | [![Build Status](https://travis-ci.org/julianscheel/pvr.octonet.svg?branch=master)](https://travis-ci.org/julianscheel/pvr.octonet) |
+| Windows (AppVeyor) | [![Build status](https://ci.appveyor.com/api/projects/status/m7dhmpmuf5coir5h?svg=true)](https://ci.appveyor.com/project/julianscheel/pvr-octonet) |
 
 # Building
 

@@ -271,6 +271,7 @@ bool SwitchChannel(const PVR_CHANNEL& channel) {
 }
 
 PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS& signalStatus) {
+	memset(&signalStatus, 0, sizeof(PVR_SIGNAL_STATUS));
 	rtsp_fill_signal_status(signalStatus);
 	return PVR_ERROR_NO_ERROR;
 }

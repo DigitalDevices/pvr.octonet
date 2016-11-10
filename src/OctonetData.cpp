@@ -286,6 +286,16 @@ const std::string& OctonetData::getUrl(int id) const {
 	return channels[0].url;
 }
 
+const std::string& OctonetData::getName(int id) const {
+	for(std::vector<OctonetChannel>::const_iterator iter = channels.begin(); iter != channels.end(); ++iter) {
+		if(iter->id == id) {
+			return iter->name;
+		}
+	}
+
+	return channels[0].name;
+}
+
 int OctonetData::getGroupCount(void)
 {
 	return groups.size();

@@ -71,6 +71,7 @@ class OctonetData : public P8PLATFORM::CThread
 
 		virtual PVR_ERROR getEPG(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t start, time_t end);
 		const std::string& getUrl(int id) const;
+		const std::string& getName(int id) const;
 
 	protected:
 		virtual bool loadChannelList(void);

@@ -2,7 +2,7 @@
 <addon
 	id="pvr.octonet"
 	version="0.3.2"
-	name="PVR DigitalDevices Octopus NET Client"
+	name="Digital Devices Octopus NET Client"
 	provider-name="digitaldevices">
 	<requires>
 		<c-pluff version="0.1" />
@@ -16,8 +16,8 @@
 		library_windx="pvr.octonet.dll"
 		library_android="libpvr.octonet.so" />
 	<extension point="xbmc.addon.metadata">
-		<summary lang="de_DE">Kodi PVR Addon für DigitalDevices Octopus NET Streams</summary>
-		<summary lang="en_US">Kodi PVR Addon for DigitalDevices Octopus NET Streams</summary>
+		<summary lang="de_DE">Kodi PVR Addon für Digital Devices Octopus NET Streams</summary>
+		<summary lang="en_US">Kodi PVR Addon for Digital Devices Octopus NET Streams</summary>
 		<platform>all</platform>
 	</extension>
 </addon>

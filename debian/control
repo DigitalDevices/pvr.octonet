@@ -11,13 +11,12 @@ Package: kodi-pvr-octonet
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: DigitalDevices Octopus NET PVR for Kodi
+Description: Digital Devices Octopus NET PVR for Kodi
  Digital Devices Octopus NET PVR for Kodi
 
 Package: kodi-pvr-octonet-dbg
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: debug symbols for DigitalDevices Octopus NET PVR for Kodi
- debug symbols for DigitalDevices Octopus NET PVR for Kodi
-
+Description: debug symbols for Digital Devices Octopus NET PVR for Kodi
+ debug symbols for Digital Devices Octopus NET PVR for Kodi

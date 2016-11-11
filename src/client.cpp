@@ -157,7 +157,7 @@ PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES *pCapabilities)
 
 const char* GetBackendName(void)
 {
-	return "DigitalDevices Octopus NET Client";
+	return "Digital Devices Octopus NET Client";
 }
 
 const char* GetBackendVersion(void)

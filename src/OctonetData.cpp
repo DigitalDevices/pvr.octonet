@@ -248,9 +248,9 @@ PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, const PVR_CHANNEL &channel, t
 
 		std::vector<OctonetEpgEntry>::iterator it;
 		time_t last_end = 0;
-		for (it = chan.epg.begin(); it < chan.epg.end(); ++it) {
-			if (end > last_end)
-				last_end = end;
+		for (it = chan.epg.begin(); it != chan.epg.end(); ++it) {
+			if (it->end > last_end)
+				last_end = it->end;
 
 			if (it->end < start || it->start > end) {
 				continue;

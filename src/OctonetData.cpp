@@ -125,7 +125,6 @@ OctonetChannel* OctonetData::findChannel(int64_t nativeId)
 time_t OctonetData::parseDateTime(std::string date)
 {
 	struct tm timeinfo;
-	time_t time;
 
 	memset(&timeinfo, 0, sizeof(timeinfo));
 

@@ -237,12 +237,15 @@ PVR_ERROR OctonetData::getChannels(ADDON_HANDLE handle, bool bRadio)
 
 PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t start, time_t end)
 {
-	bool needs_reload = false;
 	for (unsigned int i = 0; i < channels.size(); i++)
 	{
 		OctonetChannel &chan = channels.at(i);
 		if (channel.iUniqueId != chan.id)
 			continue;
+
+		if(chan.epg.empty()) {
+			loadEPG();
+		}
 
 		// FIXME: Check if reload is needed!?
 
@@ -271,6 +274,24 @@ PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, const PVR_CHANNEL &channel, t
 
 		if (last_end < end)
 			loadEPG();
+
+		for (it = chan.epg.begin(); it != chan.epg.end(); ++it) {
+			if (it->end < start || it->start > end) {
+				continue;
+			}
+
+			EPG_TAG entry;
+			memset(&entry, 0, sizeof(EPG_TAG));
+
+			entry.iChannelNumber = i;
+			entry.iUniqueBroadcastId = it->id;
+			entry.strTitle = it->title.c_str();
+			entry.strPlotOutline = it->subtitle.c_str();
+			entry.startTime = it->start;
+			entry.endTime = it->end;
+
+			pvr->TransferEpgEntry(handle, &entry);
+		}
 	}
 
 	return PVR_ERROR_NO_ERROR;

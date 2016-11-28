@@ -302,7 +302,7 @@ bool CanSeekStream() { return false; }
 
 /* Callbacks */
 void PauseStream(bool bPaused) {}
-bool SeekTime(int time, bool backwards, double *startpts) { return false; }
+bool SeekTime(double time, bool backwards, double *startpts) { return false; }
 void SetSpeed(int speed) {}
 PVR_ERROR SetEPGTimeFrame(int) { return PVR_ERROR_NOT_IMPLEMENTED; }
 

@@ -1,5 +1,5 @@
 # Octonet PVR
-Digital Devices [Octonet] (http://www.digital-devices.eu/shop/de/netzwerk-tv/) PVR client addon for [Kodi] (http://kodi.tv)
+Digital Devices [Octonet](http://www.digital-devices.eu/shop/de/netzwerk-tv/) PVR client addon for [Kodi](http://kodi.tv)
 
 | Platform | Status |
 |----------|--------|
@@ -8,25 +8,33 @@ Digital Devices [Octonet] (http://www.digital-devices.eu/shop/de/netzwerk-tv/) P
 
 # Building
 
-## Windows
-1. Create a file `project/cmake/addons/addons/kodi.pvr.octonet/kodi.pvr.octonet.txt` containing a
-   single line `kodi.pvr.octonet file://C:\some\path`. The path doesn't matter and doesn't need to
-   actually exist.
+These instructions work on all supported platforms for the most part. Obviously, paths need to be
+adjusted according to your OS (`/` vs `\`). We use Linux paths here as an example.
 
-2. Use a shell that has environment variables setup by Visual Studio for the native x86 toolchain.
-   Run the following in a new build directory and adjust paths accordingly:
+Clone the `pvr.octonet` repository:
 
 ```
-cmake -G "NMake Makefiles" ^
-    -DCMAKE_BUILD_TYPE=Release ^
-    -DADDONS_TO_BUILD="kodi.pvr.octonet" ^
-    -DADDON_SRC_PREFIX="path_to_where_kodi.pvr.octonet_is" ^
-    -DCMAKE_INSTALL_PREFIX="some_subdirectory" ^
-    -DPACKAGE_ZIP=ON ^
-    "path_to_kodi\project\cmake\addons"
+$ git clone https://github.com/DigitalDevices/pvr.octonet.git
 ```
 
-Make sure `ADDON_SRC_PREFIX` points to the parent directory of `kodi.pvr.octonet`.
+Clone the Kodi repository:
 
-4. Build the addon by running `nmake`. Run `nmake package-addons` to package a zip file of the
-   addon.
+```
+$ git clone https://github.com/xbmc/xbmc.git
+```
+
+If you already have a local Kodi checkout, you can use that one. Just make sure it is recent enough
+(Kodi 17 Beta 5 or later should work).
+
+```
+$ cd pvr.octonet
+$ mkdir build
+$ cd build
+$ cmake -DCMAKE_BUILD_TYPE=Release -DADDONS_TO_BUILD="pvr.octonet" -DADDON_SRC_PREFIX="path to parent of pvr.octonet" -DCMAKE_INSTALL_PREFIX="install" -DPACKAGE_ZIP=ON "path to kodi/project/cmake/addons"
+```
+
+On Windows, you should add `-G "NMake Makefiles"` to the CMake invocation. Make sure that
+`ADDON_SRC_PREFIX` does _not_ point directly to `pvr.octonet` but instead to its parent directory.
+
+Finally, build the plugin with `make` (or `nmake` on Windows). The plugin should be in an `install`
+subdirectory.

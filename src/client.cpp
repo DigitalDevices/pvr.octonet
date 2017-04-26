@@ -97,25 +97,12 @@ ADDON_STATUS ADDON_GetStatus()
 	return addonStatus;
 }
 
-bool ADDON_HasSettings()
-{
-	return true;
-}
-
-unsigned int ADDON_GetSettings(ADDON_StructSetting ***sSet)
-{
-	return 0;
-}
-
 ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
 {
 	/* For simplicity do a full addon restart whenever settings are
 	 * changed */
 	return ADDON_STATUS_NEED_RESTART;
 }
-
-void ADDON_FreeSettings() {} /* no-op */
-void ADDON_Announce(const char *flag, const char *sender, const char *message, const void *data) {} /* no-op */
 
 }
 

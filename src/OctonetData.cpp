@@ -42,7 +42,7 @@ OctonetData::OctonetData()
 	lastEpgLoad = 0;
 
 	if (!loadChannelList())
-		kodi->QueueNotification(QUEUE_ERROR, kodi->GetLocalizedString(30001), channels.size());
+		libKodi->QueueNotification(QUEUE_ERROR, libKodi->GetLocalizedString(30001), channels.size());
 }
 
 OctonetData::~OctonetData(void)
@@ -68,15 +68,15 @@ int64_t OctonetData::parseID(std::string id)
 bool OctonetData::loadChannelList()
 {
 	std::string jsonContent;
-	void *f = kodi->OpenFile(("http://" + serverAddress + "/channellist.lua?select=json").c_str(), 0);
+	void *f = libKodi->OpenFile(("http://" + serverAddress + "/channellist.lua?select=json").c_str(), 0);
 	if (!f)
 		return false;
 
 	char buf[1024];
-	while (int read = kodi->ReadFile(f, buf, 1024))
+	while (int read = libKodi->ReadFile(f, buf, 1024))
 		jsonContent.append(buf, read);
 
-	kodi->CloseFile(f);
+	libKodi->CloseFile(f);
 
 	Json::Value root;
 	Json::Reader reader;
@@ -153,15 +153,15 @@ bool OctonetData::loadEPG(void)
 		return false;
 
 	std::string jsonContent;
-	void *f = kodi->OpenFile(("http://" + serverAddress + "/epg.lua?;#|encoding=gzip").c_str(), 0);
+	void *f = libKodi->OpenFile(("http://" + serverAddress + "/epg.lua?;#|encoding=gzip").c_str(), 0);
 	if (!f)
 		return false;
 
 	char buf[1024];
-	while (int read = kodi->ReadFile(f, buf, 1024))
+	while (int read = libKodi->ReadFile(f, buf, 1024))
 		jsonContent.append(buf, read);
 
-	kodi->CloseFile(f);
+	libKodi->CloseFile(f);
 
 	Json::Value root;
 	Json::Reader reader;
@@ -190,7 +190,7 @@ bool OctonetData::loadEPG(void)
 			channel = findChannel(entry.channelId);
 
 		if (channel == NULL) {
-			kodi->Log(LOG_ERROR, "EPG for unknown channel.");
+			libKodi->Log(LOG_ERROR, "EPG for unknown channel.");
 			continue;
 		}
 

@@ -36,7 +36,7 @@ std::string octonetAddress = "";
 
 /* internal state variables */
 ADDON_STATUS addonStatus = ADDON_STATUS_UNKNOWN;
-CHelper_libXBMC_addon *kodi = NULL;
+CHelper_libXBMC_addon *libKodi = NULL;
 CHelper_libXBMC_pvr *pvr = NULL;
 
 OctonetData *data = NULL;
@@ -49,7 +49,7 @@ extern "C" {
 void ADDON_ReadSettings(void)
 {
 	char buffer[2048];
-	if (kodi->GetSetting("octonetAddress", &buffer))
+	if (libKodi->GetSetting("octonetAddress", &buffer))
 		octonetAddress = buffer;
 }
 
@@ -59,22 +59,22 @@ ADDON_STATUS ADDON_Create(void *callbacks, void* props)
 		return ADDON_STATUS_UNKNOWN;
 
 	PVR_PROPERTIES *pvrprops = (PVR_PROPERTIES*)props;
-	kodi = new CHelper_libXBMC_addon;
-	if (!kodi->RegisterMe(callbacks)) {
-		kodi->Log(LOG_ERROR, "%s: Failed to register octonet addon", __func__);
-		SAFE_DELETE(kodi);
+	libKodi = new CHelper_libXBMC_addon;
+	if (!libKodi->RegisterMe(callbacks)) {
+		libKodi->Log(LOG_ERROR, "%s: Failed to register octonet addon", __func__);
+		SAFE_DELETE(libKodi);
 		return ADDON_STATUS_PERMANENT_FAILURE;
 	}
 
 	pvr = new CHelper_libXBMC_pvr;
 	if (!pvr->RegisterMe(callbacks)) {
-		kodi->Log(LOG_ERROR, "%s: Failed to register octonet pvr addon", __func__);
+		libKodi->Log(LOG_ERROR, "%s: Failed to register octonet pvr addon", __func__);
 		SAFE_DELETE(pvr);
-		SAFE_DELETE(kodi);
+		SAFE_DELETE(libKodi);
 		return ADDON_STATUS_PERMANENT_FAILURE;
 	}
 
-	kodi->Log(LOG_DEBUG, "%s: Creating octonet pvr addon", __func__);
+	libKodi->Log(LOG_DEBUG, "%s: Creating octonet pvr addon", __func__);
 	ADDON_ReadSettings();
 
 	data = new OctonetData;
@@ -88,7 +88,7 @@ void ADDON_Stop() {} /* no-op */
 void ADDON_Destroy()
 {
 	delete pvr;
-	delete kodi;
+	delete libKodi;
 	addonStatus = ADDON_STATUS_UNKNOWN;
 }
 
@@ -174,12 +174,12 @@ PVR_ERROR GetDriveSpace(long long* iTotal, long long* iUsed) { return PVR_ERROR_
 PVR_ERROR CallMenuHook(const PVR_MENUHOOK& menuhook, const PVR_MENUHOOK_DATA &item) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 void OnSystemSleep() {
-	kodi->Log(LOG_INFO, "Received event: %s", __FUNCTION__);
+	libKodi->Log(LOG_INFO, "Received event: %s", __FUNCTION__);
 	// FIXME: Disconnect?
 }
 
 void OnSystemWake() {
-	kodi->Log(LOG_INFO, "Received event: %s", __FUNCTION__);
+	libKodi->Log(LOG_INFO, "Received event: %s", __FUNCTION__);
 	// FIXME:Reconnect?
 }
 

@@ -309,13 +309,13 @@ bool rtsp_open(const string& name, const string& url_str)
 	rtsp->level = 0;
 	rtsp->quality = 0;
 
-	kodi->Log(LOG_DEBUG, "try to open '%s'", url_str.c_str());
+	libKodi->Log(LOG_DEBUG, "try to open '%s'", url_str.c_str());
 
 	url dst = parse_url(url_str);
-	kodi->Log(LOG_DEBUG, "connect to host '%s'", dst.host.c_str());
+	libKodi->Log(LOG_DEBUG, "connect to host '%s'", dst.host.c_str());
 
 	if(!rtsp->tcp_sock.connect(dst.host, dst.port)) {
-		kodi->Log(LOG_ERROR, "Failed to connect to RTSP server %s:%d", dst.host.c_str(), dst.port);
+		libKodi->Log(LOG_ERROR, "Failed to connect to RTSP server %s:%d", dst.host.c_str(), dst.port);
 		goto error;
 	}
 
@@ -353,7 +353,7 @@ bool rtsp_open(const string& name, const string& url_str)
 	rtsp->tcp_sock.send(setup_ss.str());
 
 	if (rtsp_handle() != RTSP_RESULT_OK) {
-		kodi->Log(LOG_ERROR, "Failed to setup RTSP session");
+		libKodi->Log(LOG_ERROR, "Failed to setup RTSP session");
 		goto error;
 	}
 
@@ -368,7 +368,7 @@ bool rtsp_open(const string& name, const string& url_str)
 	rtsp->tcp_sock.send(play_ss.str());
 
 	if (rtsp_handle() != RTSP_RESULT_OK) {
-		kodi->Log(LOG_ERROR, "Failed to play RTSP session");
+		libKodi->Log(LOG_ERROR, "Failed to play RTSP session");
 		goto error;
 	}
 
@@ -453,7 +453,7 @@ static void rtsp_teardown() {
 		rtsp->tcp_sock.send(ss.str());
 
 		if (rtsp_handle() != RTSP_RESULT_OK) {
-			kodi->Log(LOG_ERROR, "Failed to teardown RTSP session");
+			libKodi->Log(LOG_ERROR, "Failed to teardown RTSP session");
 			return;
 		}
 	}

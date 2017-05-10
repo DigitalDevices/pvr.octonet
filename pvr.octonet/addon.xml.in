@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
 	id="pvr.octonet"
-	version="0.3.6"
+	version="0.3.7"
 	name="Digital Devices Octopus NET Client"
 	provider-name="digitaldevices">
-	<requires>
-		<c-pluff version="0.1" />
-		<import addon="xbmc.pvr" version="5.2.2" />
-	</requires>
+	<requires>@ADDON_DEPENDS@</requires>
 	<extension
 		point="xbmc.pvrclient"
 		library_linux="pvr.octonet.so"

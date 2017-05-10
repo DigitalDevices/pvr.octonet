@@ -26,6 +26,11 @@ set(OCTONET_SOURCES
 	src/Socket.cpp
 	src/rtsp_client.cpp)
 
+set(OCTONET_HEADERS
+	src/client.h
+	src/OctonetData.h
+	src/Socket.h)
+
 build_addon(pvr.octonet OCTONET DEPLIBS)
 
 if(WIN32)

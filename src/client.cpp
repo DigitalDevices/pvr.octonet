@@ -112,26 +112,6 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
 extern "C"
 {
 
-const char* GetPVRAPIVersion(void)
-{
-	return XBMC_PVR_API_VERSION;
-}
-
-const char* GetMininumPVRAPIVersion(void)
-{
-	return XBMC_PVR_MIN_API_VERSION;
-}
-
-const char* GetGUIAPIVersion(void)
-{
-	return KODI_GUILIB_API_VERSION;
-}
-
-const char* GetMininumGUIAPIVersion(void)
-{
-	return KODI_GUILIB_MIN_API_VERSION;
-}
-
 PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES *pCapabilities)
 {
 	pCapabilities->bSupportsTV = true;
@@ -149,7 +129,7 @@ const char* GetBackendName(void)
 
 const char* GetBackendVersion(void)
 {
-	return XBMC_PVR_API_VERSION;
+	return STR(OCTONET_VERSION);
 }
 
 const char* GetConnectionString(void)

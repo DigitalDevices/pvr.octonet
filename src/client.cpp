@@ -83,8 +83,6 @@ ADDON_STATUS ADDON_Create(void *callbacks, void* props)
 	return addonStatus;
 }
 
-void ADDON_Stop() {} /* no-op */
-
 void ADDON_Destroy()
 {
 	delete pvr;

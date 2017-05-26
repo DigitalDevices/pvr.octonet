@@ -37,9 +37,9 @@ before_install:
 before_script:
   - cd $TRAVIS_BUILD_DIR/..
   - git clone --depth=1 https://github.com/xbmc/xbmc.git
-  - mkdir -p xbmc/project/cmake/addons/addons/pvr.octonet
-  - echo "pvr.octonet https://github.com/DigitalDevices/pvr.octonet master" > xbmc/project/cmake/addons/addons/pvr.octonet/pvr.octonet.txt
+  - mkdir -p xbmc/cmake/addons/addons/pvr.octonet
+  - echo "pvr.octonet https://github.com/DigitalDevices/pvr.octonet master" > xbmc/cmake/addons/addons/pvr.octonet/pvr.octonet.txt
   - cd $TRAVIS_BUILD_DIR && mkdir build && cd build
-  - cmake -DADDONS_TO_BUILD=pvr.octonet -DADDON_SRC_PREFIX=$TRAVIS_BUILD_DIR/.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../xbmc/addons -DPACKAGE_ZIP=1 $TRAVIS_BUILD_DIR/../xbmc/project/cmake/addons
+  - cmake -DADDONS_TO_BUILD=pvr.octonet -DADDON_SRC_PREFIX=$TRAVIS_BUILD_DIR/.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/../xbmc/addons -DPACKAGE_ZIP=1 $TRAVIS_BUILD_DIR/../xbmc/cmake/addons
 
 script: make

@@ -24,7 +24,7 @@ environment:
 build_script:
   - cd ..
   - set ROOT=%cd%
-  - git clone --depth=1 https://github.com/xbmc/xbmc.git
+  - git clone --depth=1 https://github.com/xbmc/xbmc.git -b Krypton
   - mkdir xbmc\project\cmake\addons\addons\pvr.octonet
   - echo pvr.octonet https://github.com/DigitalDevices/pvr.octonet master > xbmc\project\cmake\addons\addons\pvr.octonet\pvr.octonet.txt
   - cd %ADDON%

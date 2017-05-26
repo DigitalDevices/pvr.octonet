@@ -30,7 +30,7 @@ If you already have a local Kodi checkout, you can use that one. Just make sure 
 $ cd pvr.octonet
 $ mkdir build
 $ cd build
-$ cmake -DCMAKE_BUILD_TYPE=Release -DADDONS_TO_BUILD="pvr.octonet" -DADDON_SRC_PREFIX="path to parent of pvr.octonet" -DCMAKE_INSTALL_PREFIX="install" -DPACKAGE_ZIP=ON "path to kodi/project/cmake/addons"
+$ cmake -DCMAKE_BUILD_TYPE=Release -DADDONS_TO_BUILD="pvr.octonet" -DADDON_SRC_PREFIX="path to parent of pvr.octonet" -DCMAKE_INSTALL_PREFIX="install" -DPACKAGE_ZIP=ON "path to kodi/cmake/addons"
 ```
 
 On Windows, you should add `-G "NMake Makefiles"` to the CMake invocation. Make sure that

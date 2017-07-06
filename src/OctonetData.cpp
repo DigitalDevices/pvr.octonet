@@ -53,14 +53,8 @@ OctonetData::~OctonetData(void)
 
 int64_t OctonetData::parseID(std::string id)
 {
-	int64_t nativeId;
-	size_t strip;
-	/* Strip colons from id */
-	while ((strip = id.find(":")) != std::string::npos)
-		id.erase(strip, 1);
-
-	std::stringstream ids(id);
-	ids >> nativeId;
+	std::hash<std::string> hash_fn;
+	int64_t nativeId = hash_fn(id);
 
 	return nativeId;
 }

@@ -21,6 +21,11 @@ environment:
     - GENERATOR: "Visual Studio 14"
       CONFIG: Release
 
+artifacts:
+  - path: build/install/
+    name: pvr.octonet
+    type: zip
+
 build_script:
   - cd ..
   - set ROOT=%cd%
@@ -31,5 +36,5 @@ build_script:
   - mkdir build
   - cd build
   # Must use absolute path for cmake to build depends correctly
-  - cmake -G "%GENERATOR%" -DADDONS_TO_BUILD=%ADDON% -DCMAKE_BUILD_TYPE=%CONFIG% -DADDON_SRC_PREFIX=%ROOT% -DCMAKE_INSTALL_PREFIX=%ROOT%\xbmc\addons -DPACKAGE_ZIP=1 %ROOT%\xbmc\cmake\addons
+  - cmake -G "%GENERATOR%" -DADDONS_TO_BUILD=%ADDON% -DCMAKE_BUILD_TYPE=%CONFIG% -DADDON_SRC_PREFIX=%ROOT% -DCMAKE_INSTALL_PREFIX=install -DPACKAGE_ZIP=1 %ROOT%\xbmc\cmake\addons
   - cmake --build . --config %CONFIG%

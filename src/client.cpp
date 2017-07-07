@@ -116,6 +116,10 @@ PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES *pCapabilities)
 	pCapabilities->bSupportsRadio = true;
 	pCapabilities->bSupportsChannelGroups = true;
 	pCapabilities->bSupportsEPG = true;
+	pCapabilities->bSupportsRecordings = false;
+	pCapabilities->bSupportsRecordingsRename = false;
+	pCapabilities->bSupportsRecordingsLifetimeChange = false;
+	pCapabilities->bSupportsDescrambleInfo = false;
 
 	return PVR_ERROR_NO_ERROR;
 }
@@ -199,6 +203,7 @@ PVR_ERROR DeleteRecording(const PVR_RECORDING& recording) { return PVR_ERROR_NOT
 PVR_ERROR UndeleteRecording(const PVR_RECORDING& recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR DeleteAllRecordingsFromTrash() { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR RenameRecording(const PVR_RECORDING& recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
+PVR_ERROR SetRecordingLifetime(const PVR_RECORDING*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR SetRecordingPlayCount(const PVR_RECORDING& recording, int count) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR SetRecordingLastPlayedPosition(const PVR_RECORDING& recording, int lastplayedposition) { return PVR_ERROR_NOT_IMPLEMENTED; }
 int GetRecordingLastPlayedPosition(const PVR_RECORDING& recording) { return PVR_ERROR_NOT_IMPLEMENTED; }
@@ -243,6 +248,7 @@ PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS& signalStatus) {
 
 const char* GetLiveStreamURL(const PVR_CHANNEL& channel) { return NULL; }
 PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties) { return PVR_ERROR_NOT_IMPLEMENTED; }
+PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 /* Recording stream handling */
 bool OpenRecordedStream(const PVR_RECORDING& recording) { return false; }

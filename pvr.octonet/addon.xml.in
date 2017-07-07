@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
 	id="pvr.octonet"
-	version="0.3.8"
+	version="0.4.0"
 	name="Digital Devices Octopus NET Client"
 	provider-name="digitaldevices">
 	<requires>@ADDON_DEPENDS@</requires>
 	<extension
 		point="xbmc.pvrclient"
-		library_linux="pvr.octonet.so"
-		library_osx="pvr.octonet.dylib"
-		library_freebsd="pvr.octonet.so"
-		library_windx="pvr.octonet.dll"
-		library_android="libpvr.octonet.so" />
+		library_@PLATFORM@="@LIBRARY_FILENAME@"/>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="de_DE">Kodi PVR Addon für Digital Devices Octopus NET Streams</summary>
 		<summary lang="en_US">Kodi PVR Addon for Digital Devices Octopus NET Streams</summary>
-		<platform>all</platform>
+		<platform>@PLATFORM@</platform>
 	</extension>
 </addon>

@@ -161,6 +161,9 @@ PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time
 	return data->getEPG(handle, channel, iStart, iEnd);
 }
 
+PVR_ERROR IsEPGTagRecordable(const EPG_TAG*, bool*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+PVR_ERROR IsEPGTagPlayable(const EPG_TAG*, bool*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+
 /* Channel groups */
 int GetChannelGroupsAmount(void)
 {
@@ -215,6 +218,11 @@ PVR_ERROR AddTimer(const PVR_TIMER& timer) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR DeleteTimer(const PVR_TIMER& timer, bool bForceDelete) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR UpdateTimer(const PVR_TIMER& timer) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
+/* PVR stream properties handling */
+PVR_ERROR GetChannelStreamProperties(const PVR_CHANNEL*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+PVR_ERROR GetRecordingStreamProperties(const PVR_RECORDING*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+PVR_ERROR GetEPGTagStreamProperties(const EPG_TAG*, PVR_NAMED_VALUE*, unsigned int*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+
 /* PVR stream handling */
 /* entirely unused, as we use standard RTSP+TS mux, which can be handlded by
  * Kodi core */
@@ -235,18 +243,13 @@ long long PositionLiveStream(void) { return -1; }
 long long LengthLiveStream(void) { return -1; }
 bool IsRealTimeStream(void) { return true; }
 
-bool SwitchChannel(const PVR_CHANNEL& channel) {
-	CloseLiveStream();
-	return OpenLiveStream(channel);
-}
-
 PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS& signalStatus) {
 	memset(&signalStatus, 0, sizeof(PVR_SIGNAL_STATUS));
 	rtsp_fill_signal_status(signalStatus);
 	return PVR_ERROR_NO_ERROR;
 }
 
-const char* GetLiveStreamURL(const PVR_CHANNEL& channel) { return NULL; }
+PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES *times) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
@@ -266,7 +269,6 @@ void DemuxFlush(void) {}
 DemuxPacket* DemuxRead(void) { return NULL; }
 
 /* Various helper functions */
-unsigned int GetChannelSwitchDelay(void) { return 0; }
 bool IsTimeshifting(void) { return false; }
 bool CanPauseStream() { return false; }
 bool CanSeekStream() { return false; }

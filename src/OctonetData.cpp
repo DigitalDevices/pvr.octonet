@@ -255,7 +255,7 @@ PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, const PVR_CHANNEL &channel, t
 			EPG_TAG entry;
 			memset(&entry, 0, sizeof(EPG_TAG));
 
-			entry.iChannelNumber = i;
+			entry.iUniqueChannelId = chan.id;
 			entry.iUniqueBroadcastId = it->id;
 			entry.strTitle = it->title.c_str();
 			entry.strPlotOutline = it->subtitle.c_str();
@@ -276,7 +276,7 @@ PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, const PVR_CHANNEL &channel, t
 			EPG_TAG entry;
 			memset(&entry, 0, sizeof(EPG_TAG));
 
-			entry.iChannelNumber = i;
+			entry.iUniqueChannelId = chan.id;
 			entry.iUniqueBroadcastId = it->id;
 			entry.strTitle = it->title.c_str();
 			entry.strPlotOutline = it->subtitle.c_str();

@@ -34,7 +34,11 @@ set(OCTONET_HEADERS
 build_addon(pvr.octonet OCTONET DEPLIBS)
 
 if(WIN32)
-	target_link_libraries(pvr.octonet wsock32 ws2_32)
+	if(NOT CMAKE_SYSTEM_NAME STREQUAL WindowsStore)
+		target_link_libraries(pvr.octonet wsock32 ws2_32)
+	else()
+		target_link_libraries(pvr.octonet ws2_32)
+	endif()
 endif()
 
 include(CPack)

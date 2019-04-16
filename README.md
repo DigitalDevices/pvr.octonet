@@ -20,11 +20,8 @@ $ git clone https://github.com/DigitalDevices/pvr.octonet.git
 Clone the Kodi repository:
 
 ```
-$ git clone https://github.com/xbmc/xbmc.git
+$ git clone --branch Leia https://github.com/xbmc/xbmc.git
 ```
-
-If you already have a local Kodi checkout, you can use that one. Just make sure it is recent enough
-(Kodi 17 Beta 5 or later should work).
 
 ```
 $ cd pvr.octonet

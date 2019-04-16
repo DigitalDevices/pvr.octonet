@@ -29,7 +29,7 @@ artifacts:
 build_script:
   - cd ..
   - set ROOT=%cd%
-  - git clone --depth=1 https://github.com/xbmc/xbmc.git
+  - git clone --branch Leia --depth=1 https://github.com/xbmc/xbmc.git
   - mkdir xbmc\cmake\addons\addons\pvr.octonet
   - echo pvr.octonet https://github.com/DigitalDevices/pvr.octonet master > xbmc\cmake\addons\addons\pvr.octonet\pvr.octonet.txt
   - cd %ADDON%

@@ -20,7 +20,7 @@ $ git clone https://github.com/DigitalDevices/pvr.octonet.git
 Clone the Kodi repository:
 
 ```
-$ git clone --branch Matrix https://github.com/xbmc/xbmc.git
+$ git clone --branch master https://github.com/xbmc/xbmc.git
 ```
 
 ```

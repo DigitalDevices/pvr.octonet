@@ -36,7 +36,7 @@ before_install:
 #
 before_script:
   - cd $TRAVIS_BUILD_DIR/..
-  - git clone --branch Matrix --depth=1 https://github.com/xbmc/xbmc.git
+  - git clone --branch master --depth=1 https://github.com/xbmc/xbmc.git
   - mkdir -p xbmc/cmake/addons/addons/pvr.octonet
   - echo "pvr.octonet https://github.com/DigitalDevices/pvr.octonet master" > xbmc/cmake/addons/addons/pvr.octonet/pvr.octonet.txt
   - cd $TRAVIS_BUILD_DIR && mkdir build && cd build

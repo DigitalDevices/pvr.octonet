@@ -228,12 +228,12 @@ PVR_ERROR OctonetData::getChannels(ADDON_HANDLE handle, bool bRadio)
 	return PVR_ERROR_NO_ERROR;
 }
 
-PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t start, time_t end)
+PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, int iChannelUid, time_t start, time_t end)
 {
 	for (unsigned int i = 0; i < channels.size(); i++)
 	{
 		OctonetChannel &chan = channels.at(i);
-		if (channel.iUniqueId != chan.id)
+		if (iChannelUid != chan.id)
 			continue;
 
 		if(chan.epg.empty()) {

@@ -69,7 +69,7 @@ class OctonetData : public P8PLATFORM::CThread
 		virtual PVR_ERROR getGroups(ADDON_HANDLE handle, bool bRadio);
 		virtual PVR_ERROR getGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
 
-		virtual PVR_ERROR getEPG(ADDON_HANDLE handle, const PVR_CHANNEL &channel, time_t start, time_t end);
+		virtual PVR_ERROR getEPG(ADDON_HANDLE handle, int iChannelUid, time_t start, time_t end);
 		const std::string& getUrl(int id) const;
 		const std::string& getName(int id) const;
 

@@ -156,9 +156,9 @@ void OnPowerSavingActivated() {}
 void OnPowerSavingDeactivated() {}
 
 /* EPG */
-PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, const PVR_CHANNEL& channel, time_t iStart, time_t iEnd)
+PVR_ERROR GetEPGForChannel(ADDON_HANDLE handle, int iChannelUid, time_t iStart, time_t iEnd)
 {
-	return data->getEPG(handle, channel, iStart, iEnd);
+	return data->getEPG(handle, iChannelUid, iStart, iEnd);
 }
 
 PVR_ERROR IsEPGTagRecordable(const EPG_TAG*, bool*) { return PVR_ERROR_NOT_IMPLEMENTED; }
@@ -266,9 +266,9 @@ void DemuxReset(void) {}
 void DemuxAbort(void) {}
 void DemuxFlush(void) {}
 DemuxPacket* DemuxRead(void) { return NULL; }
+void FillBuffer(bool mode) {}
 
 /* Various helper functions */
-bool IsTimeshifting(void) { return false; }
 bool CanPauseStream() { return false; }
 bool CanSeekStream() { return false; }
 

@@ -26,7 +26,6 @@
 #include <json/json.h>
 
 #include "OctonetData.h"
-#include "p8-platform/util/StringUtils.h"
 
 #ifdef __WINDOWS__
 #define timegm _mkgmtime

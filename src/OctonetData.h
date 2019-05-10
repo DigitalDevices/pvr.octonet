@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "p8-platform/threads/threads.h"
-#include "p8-platform/util/StdString.h"
 #include "client.h"
 
 struct OctonetEpgEntry

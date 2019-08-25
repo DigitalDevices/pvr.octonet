@@ -5,7 +5,7 @@
 #include "Socket.h"
 #include "client.h"
 #include <p8-platform/util/util.h>
-#include <libXBMC_addon.h>
+#include <kodi/libXBMC_addon.h>
 #include <cstring>
 #include <sstream>
 

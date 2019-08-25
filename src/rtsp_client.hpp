@@ -2,7 +2,7 @@
 #define _RTSP_CLIENT_HPP_
 
 #include <string>
-#include <xbmc_pvr_types.h>
+#include <kodi/xbmc_pvr_types.h>
 
 bool rtsp_open(const std::string& name, const std::string& url_str);
 void rtsp_close();

@@ -253,6 +253,9 @@ PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, int iChannelUid, time_t start
 
 			EPG_TAG entry;
 			memset(&entry, 0, sizeof(EPG_TAG));
+			entry.iSeriesNumber = EPG_TAG_INVALID_SERIES_EPISODE;
+			entry.iEpisodeNumber = EPG_TAG_INVALID_SERIES_EPISODE;
+			entry.iEpisodePartNumber = EPG_TAG_INVALID_SERIES_EPISODE;
 
 			entry.iUniqueChannelId = chan.id;
 			entry.iUniqueBroadcastId = it->id;
@@ -274,6 +277,9 @@ PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, int iChannelUid, time_t start
 
 			EPG_TAG entry;
 			memset(&entry, 0, sizeof(EPG_TAG));
+			entry.iSeriesNumber = EPG_TAG_INVALID_SERIES_EPISODE;
+			entry.iEpisodeNumber = EPG_TAG_INVALID_SERIES_EPISODE;
+			entry.iEpisodePartNumber = EPG_TAG_INVALID_SERIES_EPISODE;
 
 			entry.iUniqueChannelId = chan.id;
 			entry.iUniqueBroadcastId = it->id;

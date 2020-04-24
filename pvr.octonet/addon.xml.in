@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
 	id="pvr.octonet"
-	version="1.2.4"
+	version="1.2.5"
 	name="Digital Devices Octopus NET Client"
 	provider-name="digitaldevices">
 	<requires>@ADDON_DEPENDS@</requires>
@@ -12,7 +12,7 @@
 		<summary lang="de_DE">Kodi PVR Addon für Digital Devices Octopus NET Streams</summary>
 		<summary lang="en_US">Kodi PVR Addon for Digital Devices Octopus NET Streams</summary>
 		<platform>@PLATFORM@</platform>
-		<license>GPL-2.0+</license>
+		<license>GPL-2.0-or-later</license>
 		<source>https://github.com/DigitalDevices/pvr.octonet</source>
 	</extension>
 </addon>

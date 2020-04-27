@@ -12,7 +12,6 @@
 #include <kodi/xbmc_pvr_dll.h>
 #include <kodi/libXBMC_addon.h>
 #include <p8-platform/util/util.h>
-#include <kodi/libKODI_guilib.h>
 
 #include "OctonetData.h"
 #include "rtsp_client.hpp"

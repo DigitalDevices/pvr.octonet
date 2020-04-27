@@ -45,7 +45,7 @@ ADDON_STATUS ADDON_Create(void *callbacks, void* props)
 	if (callbacks == NULL || props == NULL)
 		return ADDON_STATUS_UNKNOWN;
 
-	PVR_PROPERTIES *pvrprops = (PVR_PROPERTIES*)props;
+	AddonProperties_PVR *pvrprops = (AddonProperties_PVR*)props;
 	libKodi = new CHelper_libXBMC_addon;
 	if (!libKodi->RegisterMe(callbacks)) {
 		libKodi->Log(LOG_ERROR, "%s: Failed to register octonet addon", __func__);

@@ -231,15 +231,15 @@ long long SeekLiveStream(long long iPosition, int iWhence) { return -1; }
 long long LengthLiveStream(void) { return -1; }
 bool IsRealTimeStream(void) { return true; }
 
-PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS& signalStatus) {
-	memset(&signalStatus, 0, sizeof(PVR_SIGNAL_STATUS));
+PVR_ERROR GetSignalStatus(int channelUid, PVR_SIGNAL_STATUS* signalStatus) {
+	memset(signalStatus, 0, sizeof(PVR_SIGNAL_STATUS));
 	rtsp_fill_signal_status(signalStatus);
 	return PVR_ERROR_NO_ERROR;
 }
 
 PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES *times) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+PVR_ERROR GetDescrambleInfo(int, PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 /* Recording stream handling */
 bool OpenRecordedStream(const PVR_RECORDING& recording) { return false; }

@@ -471,10 +471,10 @@ void rtsp_close()
 	}
 }
 
-void rtsp_fill_signal_status(PVR_SIGNAL_STATUS& signal_status) {
+void rtsp_fill_signal_status(PVR_SIGNAL_STATUS* signal_status) {
 	if(rtsp) {
-		strncpy(signal_status.strServiceName, rtsp->name.c_str(), PVR_ADDON_NAME_STRING_LENGTH - 1);
-		signal_status.iSNR = 0x1111 * rtsp->quality;
-		signal_status.iSignal = 0x101 * rtsp->level;
+		strncpy(signal_status->strServiceName, rtsp->name.c_str(), PVR_ADDON_NAME_STRING_LENGTH - 1);
+		signal_status->iSNR = 0x1111 * rtsp->quality;
+		signal_status->iSignal = 0x101 * rtsp->level;
 	}
 }

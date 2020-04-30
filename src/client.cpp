@@ -12,7 +12,6 @@
 #include <kodi/xbmc_pvr_dll.h>
 #include <kodi/libXBMC_addon.h>
 #include <p8-platform/util/util.h>
-#include <kodi/libKODI_guilib.h>
 
 #include "OctonetData.h"
 #include "rtsp_client.hpp"
@@ -46,7 +45,7 @@ ADDON_STATUS ADDON_Create(void *callbacks, void* props)
 	if (callbacks == NULL || props == NULL)
 		return ADDON_STATUS_UNKNOWN;
 
-	PVR_PROPERTIES *pvrprops = (PVR_PROPERTIES*)props;
+	AddonProperties_PVR *pvrprops = (AddonProperties_PVR*)props;
 	libKodi = new CHelper_libXBMC_addon;
 	if (!libKodi->RegisterMe(callbacks)) {
 		libKodi->Log(LOG_ERROR, "%s: Failed to register octonet addon", __func__);
@@ -98,7 +97,7 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
 extern "C"
 {
 
-PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES *pCapabilities)
+PVR_ERROR GetCapabilities(PVR_ADDON_CAPABILITIES *pCapabilities)
 {
 	pCapabilities->bSupportsTV = true;
 	pCapabilities->bSupportsRadio = true;
@@ -232,15 +231,15 @@ long long SeekLiveStream(long long iPosition, int iWhence) { return -1; }
 long long LengthLiveStream(void) { return -1; }
 bool IsRealTimeStream(void) { return true; }
 
-PVR_ERROR SignalStatus(PVR_SIGNAL_STATUS& signalStatus) {
-	memset(&signalStatus, 0, sizeof(PVR_SIGNAL_STATUS));
+PVR_ERROR GetSignalStatus(int channelUid, PVR_SIGNAL_STATUS* signalStatus) {
+	memset(signalStatus, 0, sizeof(PVR_SIGNAL_STATUS));
 	rtsp_fill_signal_status(signalStatus);
 	return PVR_ERROR_NO_ERROR;
 }
 
 PVR_ERROR GetStreamTimes(PVR_STREAM_TIMES *times) { return PVR_ERROR_NOT_IMPLEMENTED; }
 PVR_ERROR GetStreamProperties(PVR_STREAM_PROPERTIES* pProperties) { return PVR_ERROR_NOT_IMPLEMENTED; }
-PVR_ERROR GetDescrambleInfo(PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
+PVR_ERROR GetDescrambleInfo(int, PVR_DESCRAMBLE_INFO*) { return PVR_ERROR_NOT_IMPLEMENTED; }
 
 /* Recording stream handling */
 bool OpenRecordedStream(const PVR_RECORDING& recording) { return false; }

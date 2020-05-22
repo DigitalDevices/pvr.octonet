@@ -40,7 +40,7 @@ void ADDON_ReadSettings(void)
 		octonetAddress = buffer;
 }
 
-ADDON_STATUS ADDON_Create(void *callbacks, void* props)
+ADDON_STATUS ADDON_Create(void* callbacks, const char* globalApiVersion, void* props)
 {
 	if (callbacks == NULL || props == NULL)
 		return ADDON_STATUS_UNKNOWN;

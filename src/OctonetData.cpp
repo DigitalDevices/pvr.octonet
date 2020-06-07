@@ -10,7 +10,11 @@
 
 #include "OctonetData.h"
 
+#include "rtsp_client.hpp"
+
 #include <json/json.h>
+#include <kodi/Filesystem.h>
+#include <kodi/General.h>
 #include <sstream>
 #include <string>
 
@@ -18,9 +22,10 @@
 #define timegm _mkgmtime
 #endif
 
-using namespace ADDON;
-
-OctonetData::OctonetData()
+OctonetData::OctonetData(const std::string& octonetAddress,
+                         KODI_HANDLE instance,
+                         const std::string& kodiVersion)
+  : kodi::addon::CInstancePVRClient(instance, kodiVersion)
 {
   m_serverAddress = octonetAddress;
   m_channels.clear();
@@ -28,13 +33,77 @@ OctonetData::OctonetData()
   m_lastEpgLoad = 0;
 
   if (!LoadChannelList())
-    libKodi->QueueNotification(QUEUE_ERROR, libKodi->GetLocalizedString(30001), m_channels.size());
+    kodi::QueueFormattedNotification(QUEUE_ERROR, kodi::GetLocalizedString(30001).c_str(),
+                                     m_channels.size());
+
+  /*
+  // Currently unused, as thread was already present before with
+  // p8platform, by remove of them was it added as C++11 thread way.
+  kodi::Log(ADDON_LOG_INFO, "%s Starting separate client update thread...", __func__);
+  m_running = true;
+  m_thread = std::thread([&] { Process(); });
+  */
 }
 
 OctonetData::~OctonetData(void)
 {
-  m_channels.clear();
-  m_groups.clear();
+  /*
+  m_running = false;
+  if (m_thread.joinable())
+    m_thread.join();
+  */
+}
+
+PVR_ERROR OctonetData::GetCapabilities(kodi::addon::PVRCapabilities& capabilities)
+{
+  capabilities.SetSupportsTV(true);
+  capabilities.SetSupportsRadio(true);
+  capabilities.SetSupportsChannelGroups(true);
+  capabilities.SetSupportsEPG(true);
+  capabilities.SetSupportsRecordings(false);
+  capabilities.SetSupportsRecordingsRename(false);
+  capabilities.SetSupportsRecordingsLifetimeChange(false);
+  capabilities.SetSupportsDescrambleInfo(false);
+
+  return PVR_ERROR_NO_ERROR;
+}
+
+PVR_ERROR OctonetData::GetBackendName(std::string& name)
+{
+  name = "Digital Devices Octopus NET Client";
+  return PVR_ERROR_NO_ERROR;
+}
+
+PVR_ERROR OctonetData::GetBackendVersion(std::string& version)
+{
+  version = STR(OCTONET_VERSION);
+  return PVR_ERROR_NO_ERROR;
+}
+
+PVR_ERROR OctonetData::GetConnectionString(std::string& connection)
+{
+  connection = "connected"; // FIXME: translate?
+  return PVR_ERROR_NO_ERROR;
+}
+
+PVR_ERROR OctonetData::GetBackendHostname(std::string& hostname)
+{
+  hostname = m_serverAddress;
+  return PVR_ERROR_NO_ERROR;
+}
+
+PVR_ERROR OctonetData::OnSystemSleep()
+{
+  kodi::Log(ADDON_LOG_INFO, "Received event: %s", __func__);
+  // FIXME: Disconnect?
+  return PVR_ERROR_NO_ERROR;
+}
+
+PVR_ERROR OctonetData::OnSystemWake()
+{
+  kodi::Log(ADDON_LOG_INFO, "Received event: %s", __func__);
+  // FIXME:Reconnect?
+  return PVR_ERROR_NO_ERROR;
 }
 
 int64_t OctonetData::ParseID(std::string id)
@@ -48,16 +117,15 @@ int64_t OctonetData::ParseID(std::string id)
 bool OctonetData::LoadChannelList()
 {
   std::string jsonContent;
-  void* f =
-      libKodi->OpenFile(("http://" + m_serverAddress + "/channellist.lua?select=json").c_str(), 0);
-  if (!f)
+  kodi::vfs::CFile f;
+  if (!f.OpenFile("http://" + m_serverAddress + "/channellist.lua?select=json", 0))
     return false;
 
   char buf[1024];
-  while (int read = libKodi->ReadFile(f, buf, 1024))
+  while (int read = f.Read(buf, 1024))
     jsonContent.append(buf, read);
 
-  libKodi->CloseFile(f);
+  f.Close();
 
   Json::Value root;
   Json::Reader reader;
@@ -96,14 +164,13 @@ bool OctonetData::LoadChannelList()
 
 OctonetChannel* OctonetData::FindChannel(int64_t nativeId)
 {
-  std::vector<OctonetChannel>::iterator it;
-  for (it = m_channels.begin(); it < m_channels.end(); ++it)
+  for (auto& channel : m_channels)
   {
-    if (it->nativeId == nativeId)
-      return &*it;
+    if (channel.nativeId == nativeId)
+      return &channel;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 time_t OctonetData::ParseDateTime(std::string date)
@@ -134,19 +201,19 @@ time_t OctonetData::ParseDateTime(std::string date)
 bool OctonetData::LoadEPG(void)
 {
   /* Reload at most every 30 seconds */
-  if (m_lastEpgLoad + 30 > time(NULL))
+  if (m_lastEpgLoad + 30 > time(nullptr))
     return false;
 
   std::string jsonContent;
-  void* f = libKodi->OpenFile(("http://" + m_serverAddress + "/epg.lua?;#|encoding=gzip").c_str(), 0);
-  if (!f)
+  kodi::vfs::CFile f;
+  if (!f.OpenFile("http://" + m_serverAddress + "/epg.lua?;#|encoding=gzip", 0))
     return false;
 
   char buf[1024];
-  while (int read = libKodi->ReadFile(f, buf, 1024))
+  while (int read = f.Read(buf, 1024))
     jsonContent.append(buf, read);
 
-  libKodi->CloseFile(f);
+  f.Close();
 
   Json::Value root;
   Json::Reader reader;
@@ -155,7 +222,7 @@ bool OctonetData::LoadEPG(void)
     return false;
 
   const Json::Value eventList = root["EventList"];
-  OctonetChannel* channel = NULL;
+  OctonetChannel* channel = nullptr;
   for (unsigned int i = 0; i < eventList.size(); i++)
   {
     const Json::Value event = eventList[i];
@@ -170,63 +237,66 @@ bool OctonetData::LoadEPG(void)
     channelId = channelId.substr(0, channelId.rfind(":"));
 
     entry.channelId = ParseID(channelId);
-    entry.id = atoi(epgId.c_str());
+    entry.id = std::stoi(epgId);
 
-    if (channel == NULL || channel->nativeId != entry.channelId)
+    if (channel == nullptr || channel->nativeId != entry.channelId)
       channel = FindChannel(entry.channelId);
 
-    if (channel == NULL)
+    if (channel == nullptr)
     {
-      libKodi->Log(LOG_ERROR, "EPG for unknown channel.");
+      kodi::Log(ADDON_LOG_ERROR, "EPG for unknown channel.");
       continue;
     }
 
     channel->epg.push_back(entry);
   }
 
-  m_lastEpgLoad = time(NULL);
+  m_lastEpgLoad = time(nullptr);
   return true;
 }
 
-void* OctonetData::Process(void)
+void OctonetData::Process()
 {
-  return NULL;
+  return;
 }
 
-int OctonetData::getChannelCount(void)
+PVR_ERROR OctonetData::GetChannelsAmount(int& amount)
 {
-  return m_channels.size();
+  amount = m_channels.size();
+  return PVR_ERROR_NO_ERROR;
 }
 
-PVR_ERROR OctonetData::getChannels(ADDON_HANDLE handle, bool bRadio)
+PVR_ERROR OctonetData::GetChannels(bool radio, kodi::addon::PVRChannelsResultSet& results)
 {
   for (unsigned int i = 0; i < m_channels.size(); i++)
   {
     OctonetChannel& channel = m_channels.at(i);
-    if (channel.radio == bRadio)
+    if (channel.radio == radio)
     {
-      PVR_CHANNEL chan;
-      memset(&chan, 0, sizeof(PVR_CHANNEL));
+      kodi::addon::PVRChannel chan;
 
-      chan.iUniqueId = channel.id;
-      chan.bIsRadio = channel.radio;
-      chan.iChannelNumber = i;
-      strncpy(chan.strChannelName, channel.name.c_str(), strlen(channel.name.c_str()));
-      strcpy(chan.strInputFormat, "video/x-mpegts");
-      chan.bIsHidden = false;
+      chan.SetUniqueId(channel.id);
+      chan.SetIsRadio(channel.radio);
+      chan.SetChannelNumber(i);
+      chan.SetChannelName(channel.name);
+      chan.SetMimeType("video/x-mpegts");
+      chan.SetIsHidden(false);
 
-      pvr->TransferChannelEntry(handle, &chan);
+      results.Add(chan);
     }
   }
   return PVR_ERROR_NO_ERROR;
 }
 
-PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, int iChannelUid, time_t start, time_t end)
+PVR_ERROR OctonetData::GetEPGForChannel(int channelUid,
+                                        time_t start,
+                                        time_t end,
+                                        kodi::addon::PVREPGTagsResultSet& results)
 {
   for (unsigned int i = 0; i < m_channels.size(); i++)
   {
     OctonetChannel& chan = m_channels.at(i);
-    if (iChannelUid != chan.id)
+    if (channelUid != chan.id)
       continue;
 
     if (chan.epg.empty())
@@ -236,58 +306,49 @@ PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, int iChannelUid, time_t start
 
     // FIXME: Check if reload is needed!?
 
-    std::vector<OctonetEpgEntry>::iterator it;
     time_t last_end = 0;
-    for (it = chan.epg.begin(); it != chan.epg.end(); ++it)
+    for (const auto& epg : chan.epg)
     {
-      if (it->end > last_end)
-        last_end = it->end;
+      if (epg.end > last_end)
+        last_end = epg.end;
 
-      if (it->end < start || it->start > end)
+      if (epg.end < start || epg.start > end)
       {
         continue;
       }
 
-      EPG_TAG entry;
-      memset(&entry, 0, sizeof(EPG_TAG));
-      entry.iSeriesNumber = EPG_TAG_INVALID_SERIES_EPISODE;
-      entry.iEpisodeNumber = EPG_TAG_INVALID_SERIES_EPISODE;
-      entry.iEpisodePartNumber = EPG_TAG_INVALID_SERIES_EPISODE;
+      kodi::addon::PVREPGTag entry;
 
-      entry.iUniqueChannelId = chan.id;
-      entry.iUniqueBroadcastId = it->id;
-      entry.strTitle = it->title.c_str();
-      entry.strPlotOutline = it->subtitle.c_str();
-      entry.startTime = it->start;
-      entry.endTime = it->end;
+      entry.SetUniqueChannelId(chan.id);
+      entry.SetUniqueBroadcastId(epg.id);
+      entry.SetTitle(epg.title);
+      entry.SetPlotOutline(epg.subtitle);
+      entry.SetStartTime(epg.start);
+      entry.SetEndTime(epg.end);
 
-      pvr->TransferEpgEntry(handle, &entry);
+      results.Add(entry);
     }
 
     if (last_end < end)
       LoadEPG();
 
-    for (it = chan.epg.begin(); it != chan.epg.end(); ++it)
+    for (const auto& epg : chan.epg)
     {
-      if (it->end < start || it->start > end)
+      if (epg.end < start || epg.start > end)
       {
         continue;
       }
 
-      EPG_TAG entry;
-      memset(&entry, 0, sizeof(EPG_TAG));
-      entry.iSeriesNumber = EPG_TAG_INVALID_SERIES_EPISODE;
-      entry.iEpisodeNumber = EPG_TAG_INVALID_SERIES_EPISODE;
-      entry.iEpisodePartNumber = EPG_TAG_INVALID_SERIES_EPISODE;
+      kodi::addon::PVREPGTag entry;
 
-      entry.iUniqueChannelId = chan.id;
-      entry.iUniqueBroadcastId = it->id;
-      entry.strTitle = it->title.c_str();
-      entry.strPlotOutline = it->subtitle.c_str();
-      entry.startTime = it->start;
-      entry.endTime = it->end;
+      entry.SetUniqueChannelId(chan.id);
+      entry.SetUniqueBroadcastId(epg.id);
+      entry.SetTitle(epg.title);
+      entry.SetPlotOutline(epg.subtitle);
+      entry.SetStartTime(epg.start);
+      entry.SetEndTime(epg.end);
 
-      pvr->TransferEpgEntry(handle, &entry);
+      results.Add(entry);
     }
   }
 
@@ -296,12 +357,11 @@ PVR_ERROR OctonetData::getEPG(ADDON_HANDLE handle, int iChannelUid, time_t start
 
 const std::string& OctonetData::GetUrl(int id) const
 {
-  for (std::vector<OctonetChannel>::const_iterator iter = m_channels.begin(); iter != m_channels.end();
-       ++iter)
+  for (const auto& channel : m_channels)
   {
-    if (iter->id == id)
+    if (channel.id == id)
     {
-      return iter->url;
+      return channel.url;
     }
   }
 
@@ -310,61 +370,59 @@ const std::string& OctonetData::GetUrl(int id) const
 
 const std::string& OctonetData::GetName(int id) const
 {
-  for (std::vector<OctonetChannel>::const_iterator iter = m_channels.begin(); iter != m_channels.end();
-       ++iter)
+  for (const auto& channel : m_channels)
   {
-    if (iter->id == id)
+    if (channel.id == id)
     {
-      return iter->name;
+      return channel.name;
     }
   }
 
   return m_channels[0].name;
 }
 
-int OctonetData::getGroupCount(void)
+PVR_ERROR OctonetData::GetChannelGroupsAmount(int& amount)
 {
-  return m_groups.size();
+  amount = m_groups.size();
+  return PVR_ERROR_NO_ERROR;
 }
 
-PVR_ERROR OctonetData::getGroups(ADDON_HANDLE handle, bool bRadio)
+PVR_ERROR OctonetData::GetChannelGroups(bool radio, kodi::addon::PVRChannelGroupsResultSet& results)
 {
-  for (unsigned int i = 0; i < m_groups.size(); i++)
+  for (const auto& group : m_groups)
   {
-    OctonetGroup& group = m_groups.at(i);
-    if (group.radio == bRadio)
+    if (group.radio == radio)
     {
-      PVR_CHANNEL_GROUP g;
-      memset(&g, 0, sizeof(PVR_CHANNEL_GROUP));
+      kodi::addon::PVRChannelGroup g;
 
-      g.iPosition = 0;
-      g.bIsRadio = group.radio;
-      strncpy(g.strGroupName, group.name.c_str(), strlen(group.name.c_str()));
+      g.SetPosition(0);
+      g.SetIsRadio(group.radio);
+      g.SetGroupName(group.name);
 
-      pvr->TransferChannelGroup(handle, &g);
+      results.Add(g);
     }
   }
 
   return PVR_ERROR_NO_ERROR;
 }
 
-PVR_ERROR OctonetData::getGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP& group)
+PVR_ERROR OctonetData::GetChannelGroupMembers(const kodi::addon::PVRChannelGroup& group,
+                                              kodi::addon::PVRChannelGroupMembersResultSet& results)
 {
-  OctonetGroup* g = FindGroup(group.strGroupName);
-  if (g == NULL)
+  const OctonetGroup* g = FindGroup(group.GetGroupName());
+  if (g == nullptr)
     return PVR_ERROR_UNKNOWN;
 
   for (unsigned int i = 0; i < g->members.size(); i++)
   {
     OctonetChannel& channel = m_channels.at(g->members[i]);
-    PVR_CHANNEL_GROUP_MEMBER m;
-    memset(&m, 0, sizeof(PVR_CHANNEL_GROUP_MEMBER));
+    kodi::addon::PVRChannelGroupMember m;
 
-    strncpy(m.strGroupName, group.strGroupName, strlen(group.strGroupName));
-    m.iChannelUniqueId = channel.id;
-    m.iChannelNumber = channel.id;
+    m.SetGroupName(group.GetGroupName());
+    m.SetChannelUniqueId(channel.id);
+    m.SetChannelNumber(channel.id);
 
-    pvr->TransferChannelGroupMember(handle, &m);
+    results.Add(m);
   }
 
   return PVR_ERROR_NO_ERROR;
@@ -372,11 +430,29 @@ PVR_ERROR OctonetData::getGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GR
 
 OctonetGroup* OctonetData::FindGroup(const std::string& name)
 {
-  for (unsigned int i = 0; i < m_groups.size(); i++)
+  for (auto& group : m_groups)
   {
-    if (m_groups.at(i).name == name)
-      return &m_groups.at(i);
+    if (group.name == name)
+      return &group;
   }
 
-  return NULL;
+  return nullptr;
+}
+
+/* PVR stream handling */
+/* entirely unused, as we use standard RTSP+TS mux, which can be handlded by
+ * Kodi core */
+bool OctonetData::OpenLiveStream(const kodi::addon::PVRChannel& channelinfo)
+{
+  return rtsp_open(GetName(channelinfo.GetUniqueId()), GetUrl(channelinfo.GetUniqueId()));
+}
+
+int OctonetData::ReadLiveStream(unsigned char* pBuffer, unsigned int iBufferSize)
+{
+  return rtsp_read(pBuffer, iBufferSize);
+}
+
+void OctonetData::CloseLiveStream()
+{
+  rtsp_close();
 }

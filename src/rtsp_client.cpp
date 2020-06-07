@@ -9,14 +9,11 @@
 #include "rtsp_client.hpp"
 
 #include "Socket.h"
-#include "client.h"
 
 #include <algorithm>
 #include <cctype>
 #include <cstring>
 #include <iterator>
-#include <kodi/libXBMC_addon.h>
-#include <p8-platform/util/util.h>
 #include <sstream>
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -52,7 +49,6 @@ int asprintf(char** sptr, char* fmt, ...)
 #define RTCP_BUFFER_SIZE 1024
 
 using namespace std;
-using namespace ADDON;
 using namespace OCTO;
 
 enum rtsp_state
@@ -359,14 +355,15 @@ bool rtsp_open(const string& name, const string& url_str)
   rtsp->level = 0;
   rtsp->quality = 0;
 
-  libKodi->Log(LOG_DEBUG, "try to open '%s'", url_str.c_str());
+  kodi::Log(ADDON_LOG_DEBUG, "try to open '%s'", url_str.c_str());
 
   url dst = parse_url(url_str);
-  libKodi->Log(LOG_DEBUG, "connect to host '%s'", dst.host.c_str());
+  kodi::Log(ADDON_LOG_DEBUG, "connect to host '%s'", dst.host.c_str());
 
   if (!rtsp->tcp_sock.connect(dst.host, dst.port))
   {
-    libKodi->Log(LOG_ERROR, "Failed to connect to RTSP server %s:%d", dst.host.c_str(), dst.port);
+    kodi::Log(ADDON_LOG_ERROR, "Failed to connect to RTSP server %s:%d", dst.host.c_str(),
+              dst.port);
     goto error;
   }
 
@@ -408,7 +405,7 @@ bool rtsp_open(const string& name, const string& url_str)
 
   if (rtsp_handle() != RTSP_RESULT_OK)
   {
-    libKodi->Log(LOG_ERROR, "Failed to setup RTSP session");
+    kodi::Log(ADDON_LOG_ERROR, "Failed to setup RTSP session");
     goto error;
   }
 
@@ -425,7 +422,7 @@ bool rtsp_open(const string& name, const string& url_str)
 
   if (rtsp_handle() != RTSP_RESULT_OK)
   {
-    libKodi->Log(LOG_ERROR, "Failed to play RTSP session");
+    kodi::Log(ADDON_LOG_ERROR, "Failed to play RTSP session");
     goto error;
   }
 
@@ -522,7 +519,7 @@ static void rtsp_teardown()
 
     if (rtsp_handle() != RTSP_RESULT_OK)
     {
-      libKodi->Log(LOG_ERROR, "Failed to teardown RTSP session");
+      kodi::Log(ADDON_LOG_ERROR, "Failed to teardown RTSP session");
       return;
     }
   }
@@ -541,12 +538,12 @@ void rtsp_close()
   }
 }
 
-void rtsp_fill_signal_status(PVR_SIGNAL_STATUS* signal_status)
+void rtsp_fill_signal_status(kodi::addon::PVRSignalStatus& signal_status)
 {
   if (rtsp)
   {
-    strncpy(signal_status->strServiceName, rtsp->name.c_str(), PVR_ADDON_NAME_STRING_LENGTH - 1);
-    signal_status->iSNR = 0x1111 * rtsp->quality;
-    signal_status->iSignal = 0x101 * rtsp->level;
+    signal_status.SetAdapterName(rtsp->name);
+    signal_status.SetSNR(0x1111 * rtsp->quality);
+    signal_status.SetSignal(0x101 * rtsp->level);
   }
 }

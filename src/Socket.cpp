@@ -8,16 +8,11 @@
 
 #include "Socket.h"
 
-#include "client.h"
-
-#include "kodi/libXBMC_addon.h"
-#include "p8-platform/os.h"
-
 #include <cstdio>
+#include <kodi/General.h>
 #include <string>
 
 using namespace std;
-using namespace ADDON;
 
 namespace OCTO
 {
@@ -146,7 +141,8 @@ bool Socket::accept(Socket& new_socket) const
   }
 
   socklen_t addr_length = sizeof(m_sockaddr);
-  new_socket.m_sd = ::accept(m_sd, const_cast<sockaddr*>((const sockaddr*)&m_sockaddr), &addr_length);
+  new_socket.m_sd =
+      ::accept(m_sd, const_cast<sockaddr*>((const sockaddr*)&m_sockaddr), &addr_length);
 
 #ifdef TARGET_WINDOWS
   if (new_socket.m_sd == INVALID_SOCKET)
@@ -192,13 +188,13 @@ int Socket::send(const char* data, const unsigned int len)
 
   if (result < 0)
   {
-    libKodi->Log(LOG_ERROR, "Socket::send  - select failed");
+    kodi::Log(ADDON_LOG_ERROR, "Socket::send  - select failed");
     close();
     return 0;
   }
   if (FD_ISSET(m_sd, &set_w))
   {
-    libKodi->Log(LOG_ERROR, "Socket::send  - failed to send data");
+    kodi::Log(ADDON_LOG_ERROR, "Socket::send  - failed to send data");
     close();
     return 0;
   }
@@ -208,7 +204,7 @@ int Socket::send(const char* data, const unsigned int len)
   if (status == -1)
   {
     errormessage(getLastError(), "Socket::send");
-    libKodi->Log(LOG_ERROR, "Socket::send  - failed to send data");
+    kodi::Log(ADDON_LOG_ERROR, "Socket::send  - failed to send data");
     close();
     return 0;
   }
@@ -292,8 +288,8 @@ bool Socket::ReadLine(string& line)
 
     if (result < 0)
     {
-      libKodi->Log(LOG_DEBUG, "%s: select failed", __FUNCTION__);
-      errormessage(getLastError(), __FUNCTION__);
+      kodi::Log(ADDON_LOG_DEBUG, "%s: select failed", __func__);
+      errormessage(getLastError(), __func__);
       close();
       return false;
     }
@@ -302,15 +298,15 @@ bool Socket::ReadLine(string& line)
     {
       if (retries != 0)
       {
-        libKodi->Log(LOG_DEBUG, "%s: timeout waiting for response, retrying... (%i)", __FUNCTION__,
-                     retries);
+        kodi::Log(ADDON_LOG_DEBUG, "%s: timeout waiting for response, retrying... (%i)", __func__,
+                  retries);
         retries--;
         continue;
       }
       else
       {
-        libKodi->Log(LOG_DEBUG, "%s: timeout waiting for response. Aborting after 10 retries.",
-                     __FUNCTION__);
+        kodi::Log(ADDON_LOG_DEBUG, "%s: timeout waiting for response. Aborting after 10 retries.",
+                  __func__);
         return false;
       }
     }
@@ -318,8 +314,8 @@ bool Socket::ReadLine(string& line)
     result = recv(m_sd, buffer, sizeof(buffer) - 1, 0);
     if (result < 0)
     {
-      libKodi->Log(LOG_DEBUG, "%s: recv failed", __FUNCTION__);
-      errormessage(getLastError(), __FUNCTION__);
+      kodi::Log(ADDON_LOG_DEBUG, "%s: recv failed", __func__);
+      errormessage(getLastError(), __func__);
       close();
       return false;
     }
@@ -394,7 +390,7 @@ bool Socket::connect(const std::string& host, const unsigned short port)
 
   if (!setHostname(host))
   {
-    libKodi->Log(LOG_ERROR, "Socket::setHostname(%s) failed.\n", host.c_str());
+    kodi::Log(ADDON_LOG_ERROR, "Socket::setHostname(%s) failed.\n", host.c_str());
     return false;
   }
   m_port = port;
@@ -443,7 +439,7 @@ bool Socket::connect(const std::string& host, const unsigned short port)
 
   if (address == nullptr)
   {
-    libKodi->Log(LOG_ERROR, "Socket::connect %s:%u\n", host.c_str(), port);
+    kodi::Log(ADDON_LOG_ERROR, "Socket::connect %s:%u\n", host.c_str(), port);
     errormessage(getLastError(), "Socket::connect");
     close();
     return false;
@@ -479,7 +475,8 @@ bool Socket::set_non_blocking(const bool b)
 
   if (ioctlsocket(m_sd, FIONBIO, &iMode) == -1)
   {
-    libKodi->Log(LOG_ERROR, "Socket::set_non_blocking - Can't set socket condition to: %i", iMode);
+    kodi::Log(ADDON_LOG_ERROR, "Socket::set_non_blocking - Can't set socket condition to: %i",
+              iMode);
     return false;
   }
 
@@ -570,7 +567,7 @@ void Socket::errormessage(int errnum, const char* functionname) const
     default:
       errmsg = "WSA Error";
   }
-  libKodi->Log(LOG_ERROR, "%s: (Winsock error=%i) %s\n", functionname, errnum, errmsg);
+  kodi::Log(ADDON_LOG_ERROR, "%s: (Winsock error=%i) %s\n", functionname, errnum, errmsg);
 }
 
 int Socket::getLastError() const
@@ -628,7 +625,7 @@ bool Socket::set_non_blocking(const bool b)
 
   if (fcntl(m_sd, F_SETFL, opts) == -1)
   {
-    libKodi->Log(LOG_ERROR, "Socket::set_non_blocking - Can't set socket flags to: %i", opts);
+    kodi::Log(ADDON_LOG_ERROR, "Socket::set_non_blocking - Can't set socket flags to: %i", opts);
     return false;
   }
   return true;
@@ -709,7 +706,7 @@ void Socket::errormessage(int errnum, const char* functionname) const
       break;
   }
 
-  libKodi->Log(LOG_ERROR, "%s: (errno=%i) %s\n", functionname, errnum, errmsg);
+  kodi::Log(ADDON_LOG_ERROR, "%s: (errno=%i) %s\n", functionname, errnum, errmsg);
 }
 
 int Socket::getLastError() const

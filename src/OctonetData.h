@@ -10,71 +10,71 @@
 
 #pragma once
 
-#include <vector>
+#include "client.h"
 
 #include "p8-platform/threads/threads.h"
-#include "client.h"
+
+#include <vector>
 
 struct OctonetEpgEntry
 {
-	int64_t channelId;
-	time_t start;
-	time_t end;
-	int id;
-	std::string title;
-	std::string subtitle;
+  int64_t channelId;
+  time_t start;
+  time_t end;
+  int id;
+  std::string title;
+  std::string subtitle;
 };
 
 struct OctonetChannel
 {
-	int64_t nativeId;
-	std::string name;
-	std::string url;
-	bool radio;
-	int id;
+  int64_t nativeId;
+  std::string name;
+  std::string url;
+  bool radio;
+  int id;
 
-	std::vector<OctonetEpgEntry> epg;
+  std::vector<OctonetEpgEntry> epg;
 };
 
 struct OctonetGroup
 {
-	std::string name;
-	bool radio;
-	std::vector<int> members;
+  std::string name;
+  bool radio;
+  std::vector<int> members;
 };
 
 class OctonetData : public P8PLATFORM::CThread
 {
-	public:
-		OctonetData(void);
-		virtual ~OctonetData(void);
+public:
+  OctonetData(void);
+  virtual ~OctonetData(void);
 
-		virtual int getChannelCount(void);
-		virtual PVR_ERROR getChannels(ADDON_HANDLE handle, bool bRadio);
+  virtual int getChannelCount(void);
+  virtual PVR_ERROR getChannels(ADDON_HANDLE handle, bool bRadio);
 
-		virtual int getGroupCount(void);
-		virtual PVR_ERROR getGroups(ADDON_HANDLE handle, bool bRadio);
-		virtual PVR_ERROR getGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
+  virtual int getGroupCount(void);
+  virtual PVR_ERROR getGroups(ADDON_HANDLE handle, bool bRadio);
+  virtual PVR_ERROR getGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP& group);
 
-		virtual PVR_ERROR getEPG(ADDON_HANDLE handle, int iChannelUid, time_t start, time_t end);
-		const std::string& getUrl(int id) const;
-		const std::string& getName(int id) const;
+  virtual PVR_ERROR getEPG(ADDON_HANDLE handle, int iChannelUid, time_t start, time_t end);
+  const std::string& GetUrl(int id) const;
+  const std::string& GetName(int id) const;
 
-	protected:
-		virtual bool loadChannelList(void);
-		virtual bool loadEPG(void);
-		virtual OctonetGroup* findGroup(const std::string &name);
+protected:
+  void* Process(void) override;
 
-		virtual void *Process(void);
+  bool LoadChannelList(void);
+  bool LoadEPG(void);
+  OctonetGroup* FindGroup(const std::string& name);
+  OctonetChannel* FindChannel(int64_t nativeId);
+  time_t ParseDateTime(std::string date);
+  int64_t ParseID(std::string id);
 
-		OctonetChannel* findChannel(int64_t nativeId);
-		time_t parseDateTime(std::string date);
-		int64_t parseID(std::string id);
+private:
+  std::string m_serverAddress;
+  std::vector<OctonetChannel> m_channels;
+  std::vector<OctonetGroup> m_groups;
 
-	private:
-		std::string serverAddress;
-		std::vector<OctonetChannel> channels;
-		std::vector<OctonetGroup> groups;
-
-		time_t lastEpgLoad;
+  time_t m_lastEpgLoad;
 };

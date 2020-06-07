@@ -17,8 +17,8 @@
 #define __func__ __FUNCTION__
 #endif
 
-extern ADDON::CHelper_libXBMC_addon *libKodi;
-extern CHelper_libXBMC_pvr *pvr;
+extern ADDON::CHelper_libXBMC_addon* libKodi;
+extern CHelper_libXBMC_pvr* pvr;
 
 /* IP or hostname of the octonet to be connected to */
 extern std::string octonetAddress;

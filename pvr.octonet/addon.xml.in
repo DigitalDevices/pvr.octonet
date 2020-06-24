@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
 	id="pvr.octonet"
-	version="2.0.0"
+	version="3.0.0"
 	name="Digital Devices Octopus NET Client"
 	provider-name="digitaldevices">
 	<requires>@ADDON_DEPENDS@</requires>
 	<extension
-		point="xbmc.pvrclient"
+		point="kodi.pvrclient"
 		library_@PLATFORM@="@LIBRARY_FILENAME@"/>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="de_DE">Kodi PVR Addon für Digital Devices Octopus NET Streams</summary>

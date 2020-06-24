@@ -10,71 +10,93 @@
 
 #pragma once
 
+#include <atomic>
+#include <kodi/addon-instance/PVR.h>
+#include <thread>
 #include <vector>
-
-#include "p8-platform/threads/threads.h"
-#include "client.h"
 
 struct OctonetEpgEntry
 {
-	int64_t channelId;
-	time_t start;
-	time_t end;
-	int id;
-	std::string title;
-	std::string subtitle;
+  int64_t channelId;
+  time_t start;
+  time_t end;
+  int id;
+  std::string title;
+  std::string subtitle;
 };
 
 struct OctonetChannel
 {
-	int64_t nativeId;
-	std::string name;
-	std::string url;
-	bool radio;
-	int id;
+  int64_t nativeId;
+  std::string name;
+  std::string url;
+  bool radio;
+  int id;
 
-	std::vector<OctonetEpgEntry> epg;
+  std::vector<OctonetEpgEntry> epg;
 };
 
 struct OctonetGroup
 {
-	std::string name;
-	bool radio;
-	std::vector<int> members;
+  std::string name;
+  bool radio;
+  std::vector<int> members;
 };
 
-class OctonetData : public P8PLATFORM::CThread
+class ATTRIBUTE_HIDDEN OctonetData : public kodi::addon::CInstancePVRClient
 {
-	public:
-		OctonetData(void);
-		virtual ~OctonetData(void);
+public:
+  OctonetData(const std::string& octonetAddress,
+              KODI_HANDLE instance,
+              const std::string& kodiVersion);
+  ~OctonetData() override;
 
-		virtual int getChannelCount(void);
-		virtual PVR_ERROR getChannels(ADDON_HANDLE handle, bool bRadio);
+  PVR_ERROR GetCapabilities(kodi::addon::PVRCapabilities& capabilities) override;
+  PVR_ERROR GetBackendName(std::string& name) override;
+  PVR_ERROR GetBackendVersion(std::string& version) override;
+  PVR_ERROR GetConnectionString(std::string& connection) override;
+  PVR_ERROR GetBackendHostname(std::string& hostname) override;
 
-		virtual int getGroupCount(void);
-		virtual PVR_ERROR getGroups(ADDON_HANDLE handle, bool bRadio);
-		virtual PVR_ERROR getGroupMembers(ADDON_HANDLE handle, const PVR_CHANNEL_GROUP &group);
+  PVR_ERROR OnSystemSleep() override;
+  PVR_ERROR OnSystemWake() override;
 
-		virtual PVR_ERROR getEPG(ADDON_HANDLE handle, int iChannelUid, time_t start, time_t end);
-		const std::string& getUrl(int id) const;
-		const std::string& getName(int id) const;
+  PVR_ERROR GetChannelsAmount(int& amount) override;
+  PVR_ERROR GetChannels(bool radio, kodi::addon::PVRChannelsResultSet& results) override;
 
-	protected:
-		virtual bool loadChannelList(void);
-		virtual bool loadEPG(void);
-		virtual OctonetGroup* findGroup(const std::string &name);
+  PVR_ERROR GetChannelGroupsAmount(int& amount) override;
+  PVR_ERROR GetChannelGroups(bool radio, kodi::addon::PVRChannelGroupsResultSet& results) override;
+  PVR_ERROR GetChannelGroupMembers(const kodi::addon::PVRChannelGroup& group,
+                                   kodi::addon::PVRChannelGroupMembersResultSet& results) override;
 
-		virtual void *Process(void);
+  PVR_ERROR GetEPGForChannel(int channelUid,
+                             time_t start,
+                             time_t end,
+                             kodi::addon::PVREPGTagsResultSet& results) override;
 
-		OctonetChannel* findChannel(int64_t nativeId);
-		time_t parseDateTime(std::string date);
-		int64_t parseID(std::string id);
+  bool OpenLiveStream(const kodi::addon::PVRChannel& channelinfo) override;
+  int ReadLiveStream(unsigned char* buffer, unsigned int size) override;
+  void CloseLiveStream() override;
 
-	private:
-		std::string serverAddress;
-		std::vector<OctonetChannel> channels;
-		std::vector<OctonetGroup> groups;
+protected:
+  void Process();
 
-		time_t lastEpgLoad;
+  const std::string& GetUrl(int id) const;
+  const std::string& GetName(int id) const;
+
+  bool LoadChannelList(void);
+  bool LoadEPG(void);
+  OctonetGroup* FindGroup(const std::string& name);
+  OctonetChannel* FindChannel(int64_t nativeId);
+  time_t ParseDateTime(std::string date);
+  int64_t ParseID(std::string id);
+
+private:
+  std::string m_serverAddress;
+  std::vector<OctonetChannel> m_channels;
+  std::vector<OctonetGroup> m_groups;
+
+  time_t m_lastEpgLoad;
+
+  std::atomic<bool> m_running = {false};
+  std::thread m_thread;
 };

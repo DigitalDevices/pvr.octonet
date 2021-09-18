@@ -3,7 +3,7 @@ Digital Devices [Octonet](http://www.digital-devices.eu/shop/de/netzwerk-tv/) PV
 
 | Platform | Status |
 |----------|--------|
-| Linux + OS X (Travis) | [![Build Status](https://travis-ci.org/julianscheel/pvr.octonet.svg?branch=master)](https://travis-ci.org/julianscheel/pvr.octonet) |
+| Linux + OS X (github) | [![Build and run tests](https://github.com/kodi-pvr/pvr.octonet/actions/workflows/build.yml/badge.svg?branch=Matrix)](https://github.com/kodi-pvr/pvr.octonet/actions/workflows/build.yml) |
 | Windows (AppVeyor) | [![Build status](https://ci.appveyor.com/api/projects/status/m7dhmpmuf5coir5h?svg=true)](https://ci.appveyor.com/project/julianscheel/pvr-octonet) |
 
 # Building

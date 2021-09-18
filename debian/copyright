@@ -5,7 +5,7 @@ Source: https://github.com/DigitalDevices/pvr.octonet
 Files: *
 Copyright: 2015-2016 Julian Scheel
            2015-2016 jusst technologies GmbH
-           2005-2020 Team Kodi
+           2005-2021 Team Kodi
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ License: GPL-2+
  Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".
 
 Files: debian/*
-Copyright: 2020 Team Kodi
+Copyright: 2020-2021 Team Kodi
            2016 Julian Scheel <julian@jusst.de>
            2015 Jean-Luc Barriere
            2015 wsnipex <wsnipex@a1.net>

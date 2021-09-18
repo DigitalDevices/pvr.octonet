@@ -1,40 +1,33 @@
 version: BuildNr.{build}
 
-init:
-- ps: $commit = $env:appveyor_repo_commit.SubString(0,7)
-- ps: $timestamp = $env:appveyor_repo_commit_timestamp.SubString(0,10)
-- ps: Update-AppveyorBuild -Version ("{0}-{1}-{2}" -f $env:appveyor_repo_branch, $commit, $timestamp)
+image: Visual Studio 2017
 
-# clone directory
+shallow_clone: true
+
 clone_folder: c:\projects\pvr.octonet
 
-# fetch repository as zip archive
-shallow_clone: true                 # default is "false"
-
 environment:
-  ADDON: pvr.octonet
+  app_id: pvr.octonet
 
   matrix:
-    #- GENERATOR: "Visual Studio 14"
-    #  CONFIG: Debug
-
-    - GENERATOR: "Visual Studio 14"
+    - GENERATOR: "Visual Studio 15"
       CONFIG: Release
-
-artifacts:
-  - path: build/install/
-    name: pvr.octonet
-    type: zip
+    - GENERATOR: "Visual Studio 15 Win64"
+      CONFIG: Release
+    - GENERATOR: "Visual Studio 15 Win64"
+      CONFIG: Release
+      WINSTORE: -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION="10.0.17763.0"
+    - GENERATOR: "Visual Studio 15 ARM"
+      CONFIG: Release
+      WINSTORE: -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION="10.0.17763.0"
 
 build_script:
   - cd ..
-  - set ROOT=%cd%
-  - git clone --branch master --depth=1 https://github.com/xbmc/xbmc.git
-  - mkdir xbmc\cmake\addons\addons\pvr.octonet
-  - echo pvr.octonet https://github.com/DigitalDevices/pvr.octonet master > xbmc\cmake\addons\addons\pvr.octonet\pvr.octonet.txt
-  - cd %ADDON%
+  - git clone --branch Matrix --depth=1 https://github.com/xbmc/xbmc.git
+  - cd %app_id%
   - mkdir build
   - cd build
-  # Must use absolute path for cmake to build depends correctly
-  - cmake -G "%GENERATOR%" -DADDONS_TO_BUILD=%ADDON% -DCMAKE_BUILD_TYPE=%CONFIG% -DADDON_SRC_PREFIX=%ROOT% -DCMAKE_INSTALL_PREFIX=install -DPACKAGE_ZIP=1 %ROOT%\xbmc\cmake\addons
-  - cmake --build . --config %CONFIG%
+  - mkdir -p definition\%app_id%
+  - echo %app_id% %APPVEYOR_BUILD_FOLDER% %APPVEYOR_REPO_COMMIT% > definition\%app_id%\%app_id%.txt
+  - cmake -T host=x64 -G "%GENERATOR%" %WINSTORE% -DADDONS_TO_BUILD=%app_id% -DCMAKE_BUILD_TYPE=%CONFIG% -DADDONS_DEFINITION_DIR=%APPVEYOR_BUILD_FOLDER%/build/definition -DADDON_SRC_PREFIX=../.. -DCMAKE_INSTALL_PREFIX=../../xbmc/addons -DPACKAGE_ZIP=1 ../../xbmc/cmake/addons
+  - cmake --build . --config %CONFIG% --target %app_id%

@@ -14,13 +14,13 @@ adjusted according to your OS (`/` vs `\`). We use Linux paths here as an exampl
 Clone the `pvr.octonet` repository:
 
 ```
-$ git clone https://github.com/DigitalDevices/pvr.octonet.git
+$ git clone --branch Matrix https://github.com/DigitalDevices/pvr.octonet.git
 ```
 
 Clone the Kodi repository:
 
 ```
-$ git clone --branch master https://github.com/xbmc/xbmc.git
+$ git clone --branch Matrix https://github.com/xbmc/xbmc.git
 ```
 
 ```

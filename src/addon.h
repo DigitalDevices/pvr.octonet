@@ -15,21 +15,17 @@
 
 class OctonetData;
 
-class ATTRIBUTE_HIDDEN COctonetAddon : public kodi::addon::CAddonBase
+class ATTR_DLL_LOCAL COctonetAddon : public kodi::addon::CAddonBase
 {
 public:
   COctonetAddon() = default;
 
   ADDON_STATUS SetSetting(const std::string& settingName,
-                          const kodi::CSettingValue& settingValue) override;
-  ADDON_STATUS CreateInstance(int instanceType,
-                              const std::string& instanceID,
-                              KODI_HANDLE instance,
-                              const std::string& version,
-                              KODI_HANDLE& addonInstance) override;
-  void DestroyInstance(int instanceType,
-                       const std::string& instanceID,
-                       KODI_HANDLE addonInstance) override;
+                          const kodi::addon::CSettingValue& settingValue) override;
+  ADDON_STATUS CreateInstance(const kodi::addon::IInstanceInfo& instance,
+                              KODI_ADDON_INSTANCE_HDL& hdl) override;
+  void DestroyInstance(const kodi::addon::IInstanceInfo& instance,
+                       const KODI_ADDON_INSTANCE_HDL hdl) override;
 
 private:
   std::unordered_map<std::string, OctonetData*> m_usedInstances;

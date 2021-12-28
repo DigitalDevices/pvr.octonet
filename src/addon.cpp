@@ -13,45 +13,41 @@
 #include "OctonetData.h"
 
 ADDON_STATUS COctonetAddon::SetSetting(const std::string& settingName,
-                                       const kodi::CSettingValue& settingValue)
+                                       const kodi::addon::CSettingValue& settingValue)
 {
   /* For simplicity do a full addon restart whenever settings are
    * changed */
   return ADDON_STATUS_NEED_RESTART;
 }
 
-ADDON_STATUS COctonetAddon::CreateInstance(int instanceType,
-                                           const std::string& instanceID,
-                                           KODI_HANDLE instance,
-                                           const std::string& version,
-                                           KODI_HANDLE& addonInstance)
+ADDON_STATUS COctonetAddon::CreateInstance(const kodi::addon::IInstanceInfo& instance,
+                                           KODI_ADDON_INSTANCE_HDL& hdl)
 {
-  if (instanceType == ADDON_INSTANCE_PVR)
+  if (instance.IsType(ADDON_INSTANCE_PVR))
   {
     kodi::Log(ADDON_LOG_DEBUG, "%s: Creating octonet pvr instance", __func__);
 
     /* IP or hostname of the octonet to be connected to */
-    std::string octonetAddress = kodi::GetSettingString("octonetAddress");
+    std::string octonetAddress = kodi::addon::GetSettingString("octonetAddress");
 
-    OctonetData* usedInstance = new OctonetData(octonetAddress, instance, version);
-    addonInstance = usedInstance;
+    OctonetData* usedInstance = new OctonetData(octonetAddress, instance);
+    hdl = usedInstance;
 
-    m_usedInstances.emplace(instanceID, usedInstance);
+    m_usedInstances.emplace(instance.GetID(), usedInstance);
     return ADDON_STATUS_OK;
   }
 
   return ADDON_STATUS_UNKNOWN;
 }
 
-void COctonetAddon::DestroyInstance(int instanceType,
-                                    const std::string& instanceID,
-                                    KODI_HANDLE addonInstance)
+void COctonetAddon::DestroyInstance(const kodi::addon::IInstanceInfo& instance,
+                                    const KODI_ADDON_INSTANCE_HDL hdl)
 {
-  if (instanceType == ADDON_INSTANCE_PVR)
+  if (instance.IsType(ADDON_INSTANCE_PVR))
   {
     kodi::Log(ADDON_LOG_DEBUG, "%s: Destoying octonet pvr instance", __func__);
 
-    const auto& it = m_usedInstances.find(instanceID);
+    const auto& it = m_usedInstances.find(instance.GetID());
     if (it != m_usedInstances.end())
     {
       m_usedInstances.erase(it);

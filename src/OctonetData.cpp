@@ -23,9 +23,8 @@
 #endif
 
 OctonetData::OctonetData(const std::string& octonetAddress,
-                         KODI_HANDLE instance,
-                         const std::string& kodiVersion)
-  : kodi::addon::CInstancePVRClient(instance, kodiVersion)
+                         const kodi::addon::IInstanceInfo& instance)
+  : kodi::addon::CInstancePVRClient(instance)
 {
   m_serverAddress = octonetAddress;
   m_channels.clear();
@@ -33,7 +32,7 @@ OctonetData::OctonetData(const std::string& octonetAddress,
   m_lastEpgLoad = 0;
 
   if (!LoadChannelList())
-    kodi::QueueFormattedNotification(QUEUE_ERROR, kodi::GetLocalizedString(30001).c_str(),
+    kodi::QueueFormattedNotification(QUEUE_ERROR, kodi::addon::GetLocalizedString(30001).c_str(),
                                      m_channels.size());
 
   /*

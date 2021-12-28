@@ -43,12 +43,11 @@ struct OctonetGroup
   std::vector<int> members;
 };
 
-class ATTRIBUTE_HIDDEN OctonetData : public kodi::addon::CInstancePVRClient
+class ATTR_DLL_LOCAL OctonetData : public kodi::addon::CInstancePVRClient
 {
 public:
   OctonetData(const std::string& octonetAddress,
-              KODI_HANDLE instance,
-              const std::string& kodiVersion);
+              const kodi::addon::IInstanceInfo& instance);
   ~OctonetData() override;
 
   PVR_ERROR GetCapabilities(kodi::addon::PVRCapabilities& capabilities) override;

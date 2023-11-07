@@ -1,10 +1,9 @@
 # Octonet PVR
 Digital Devices [Octonet](http://www.digital-devices.eu/shop/de/netzwerk-tv/) PVR client addon for [Kodi](http://kodi.tv)
 
-| Platform | Status |
-|----------|--------|
-| Linux + OS X (github) | [![Build and run tests](https://github.com/kodi-pvr/pvr.octonet/actions/workflows/build.yml/badge.svg?branch=Nexus)](https://github.com/kodi-pvr/pvr.octonet/actions/workflows/build.yml) |
-| Windows (AppVeyor) | [![Build status](https://ci.appveyor.com/api/projects/status/m7dhmpmuf5coir5h?svg=true)](https://ci.appveyor.com/project/julianscheel/pvr-octonet) |
+[![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL%20v2+-blue.svg)](LICENSE.md)
+[![Build and run tests](https://github.com/DigitalDevices/pvr.octonet/actions/workflows/build.yml/badge.svg?branch=Nexus)](https://github.com/DigitalDevices/pvr.octonet/actions/workflows/build.yml)
+[![Build Status](https://jenkins.kodi.tv/view/Addons/job/DigitalDevices/job/pvr.octonet/job/Nexus/badge/icon)](https://jenkins.kodi.tv/blue/organizations/jenkins/DigitalDevices%2Fpvr.octonet/branches/)
 
 # Building
 

@@ -127,9 +127,11 @@ bool OctonetData::LoadChannelList()
   f.Close();
 
   Json::Value root;
-  Json::Reader reader;
+  JSONCPP_STRING err;
+  Json::CharReaderBuilder builder;
+  const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
 
-  if (!reader.parse(jsonContent, root, false))
+  if (!reader->parse(jsonContent.c_str(), jsonContent.c_str() + jsonContent.length(), &root, &err))
     return false;
 
   const Json::Value groupList = root["GroupList"];
@@ -215,9 +217,11 @@ bool OctonetData::LoadEPG(void)
   f.Close();
 
   Json::Value root;
-  Json::Reader reader;
+  JSONCPP_STRING err;
+  Json::CharReaderBuilder builder;
+  const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
 
-  if (!reader.parse(jsonContent, root, false))
+  if (!reader->parse(jsonContent.c_str(), jsonContent.c_str() + jsonContent.length(), &root, &err))
     return false;
 
   const Json::Value eventList = root["EventList"];

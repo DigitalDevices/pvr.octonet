@@ -4,7 +4,9 @@
   version="20.3.0"
   name="Digital Devices Octopus NET Client"
   provider-name="digitaldevices">
-  <requires>@ADDON_DEPENDS@</requires>
+  <requires>@ADDON_DEPENDS@
+    <import addon="inputstream.ffmpegdirect" minversion="21.0.0"/>
+  </requires>
   <extension
     point="kodi.pvrclient"
     library_@PLATFORM@="@LIBRARY_FILENAME@"/>

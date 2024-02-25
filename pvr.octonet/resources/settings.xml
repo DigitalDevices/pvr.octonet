@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings version="1">
   <section id="pvr.octonet">
-    <category id="main" label="128" help="-1">
+    <category id="main" label="128" help="30601">
       <group id="1" label="-1">
         <!-- Octonet Server Address -->
-        <setting id="octonetAddress" type="string" label="30000" help="-1">
+        <setting id="octonetAddress" type="string" label="30000" help="30600">
           <level>0</level>
           <default></default>
           <constraints>
             <allowempty>true</allowempty>
           </constraints>
           <control type="edit" format="string" />
+        </setting>
+      </group>
+    </category>
+    <category id="timeshift" label="30002" help="30602">
+      <group id="1" label="30002">
+        <setting id="timeshiftEnabled" type="boolean" label="30003" help="30603">
+          <level>0</level>
+          <default>false</default>
+          <control type="toggle" />
+        </setting>
+      </group>
+      <group id="2" label="30005">
+        <setting id="ffmpegdirectSettings" type="action" label="30004" help="30604">
+          <level>0</level>
+          <data>Addon.OpenSettings(inputstream.ffmpegdirect)</data>
+          <dependencies>
+            <dependency type="enable" setting="timeshiftEnabled" operator="is">true</dependency>
+          </dependencies>
+          <control type="button" format="action">
+            <close>true</close>
+          </control>
         </setting>
       </group>
     </category>

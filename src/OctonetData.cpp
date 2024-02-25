@@ -10,8 +10,6 @@
 
 #include "OctonetData.h"
 
-#include "rtsp_client.hpp"
-
 #include <json/json.h>
 #include <kodi/Filesystem.h>
 #include <kodi/General.h>
@@ -23,10 +21,12 @@
 #endif
 
 OctonetData::OctonetData(const std::string& octonetAddress,
+                         bool enableTimeshift,
                          const kodi::addon::IInstanceInfo& instance)
   : kodi::addon::CInstancePVRClient(instance)
 {
   m_serverAddress = octonetAddress;
+  m_enableTimeshift = enableTimeshift;
   m_channels.clear();
   m_groups.clear();
   m_lastEpgLoad = 0;
@@ -273,6 +273,25 @@ PVR_ERROR OctonetData::GetChannels(bool radio, kodi::addon::PVRChannelsResultSet
   return PVR_ERROR_NO_ERROR;
 }
 
+PVR_ERROR OctonetData::GetChannelStreamProperties(const kodi::addon::PVRChannel& channelinfo, std::vector<kodi::addon::PVRStreamProperty>& properties)
+{
+  properties.emplace_back(PVR_STREAM_PROPERTY_INPUTSTREAM, "inputstream.ffmpegdirect");
+  properties.emplace_back("inputstream.ffmpegdirect.is_realtime_stream", "true");
+  properties.emplace_back("inputstream.ffmpegdirect.open_mode", "ffmpeg");
+  if (m_enableTimeshift)
+  {
+    // This property is required to support timeshifting for Radio channels
+    properties.emplace_back("inputstream-player", "videodefaultplayer");
+    properties.emplace_back("inputstream.ffmpegdirect.stream_mode", "timeshift");
+  }
+  properties.emplace_back(PVR_STREAM_PROPERTY_MIMETYPE, "video/x-mpegts");
+  properties.emplace_back(PVR_STREAM_PROPERTY_STREAMURL, GetUrl(channelinfo.GetUniqueId()));
+
+  kodi::Log(ADDON_LOG_INFO, "Playing channel - name: %s, url: %s, and using inputstream.ffmpegdirect", GetName(channelinfo.GetUniqueId()).c_str(), GetUrl(channelinfo.GetUniqueId()).c_str());
+
+  return PVR_ERROR_NO_ERROR;
+}
+
 PVR_ERROR OctonetData::GetEPGForChannel(int channelUid,
                                         time_t start,
                                         time_t end,
@@ -426,20 +445,3 @@ OctonetGroup* OctonetData::FindGroup(const std::string& name)
   return nullptr;
 }
 
-/* PVR stream handling */
-/* entirely unused, as we use standard RTSP+TS mux, which can be handlded by
- * Kodi core */
-bool OctonetData::OpenLiveStream(const kodi::addon::PVRChannel& channelinfo)
-{
-  return rtsp_open(GetName(channelinfo.GetUniqueId()), GetUrl(channelinfo.GetUniqueId()));
-}
-
-int OctonetData::ReadLiveStream(unsigned char* pBuffer, unsigned int iBufferSize)
-{
-  return rtsp_read(pBuffer, iBufferSize);
-}
-
-void OctonetData::CloseLiveStream()
-{
-  rtsp_close();
-}

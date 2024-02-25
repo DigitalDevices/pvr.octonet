@@ -47,6 +47,7 @@ class ATTR_DLL_LOCAL OctonetData : public kodi::addon::CInstancePVRClient
 {
 public:
   OctonetData(const std::string& octonetAddress,
+              bool enableTimeshift,
               const kodi::addon::IInstanceInfo& instance);
   ~OctonetData() override;
 
@@ -66,15 +67,12 @@ public:
   PVR_ERROR GetChannelGroups(bool radio, kodi::addon::PVRChannelGroupsResultSet& results) override;
   PVR_ERROR GetChannelGroupMembers(const kodi::addon::PVRChannelGroup& group,
                                    kodi::addon::PVRChannelGroupMembersResultSet& results) override;
+  PVR_ERROR GetChannelStreamProperties(const kodi::addon::PVRChannel& channel, std::vector<kodi::addon::PVRStreamProperty>& properties) override;
 
   PVR_ERROR GetEPGForChannel(int channelUid,
                              time_t start,
                              time_t end,
                              kodi::addon::PVREPGTagsResultSet& results) override;
-
-  bool OpenLiveStream(const kodi::addon::PVRChannel& channelinfo) override;
-  int ReadLiveStream(unsigned char* buffer, unsigned int size) override;
-  void CloseLiveStream() override;
 
 protected:
   const std::string& GetUrl(int id) const;
@@ -89,6 +87,7 @@ protected:
 
 private:
   std::string m_serverAddress;
+  bool m_enableTimeshift = false;
   std::vector<OctonetChannel> m_channels;
   std::vector<OctonetGroup> m_groups;
 

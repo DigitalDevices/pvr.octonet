@@ -27,3 +27,41 @@ msgstr ""
 msgctxt "#30001"
 msgid "Could not load chanellist"
 msgstr ""
+
+msgctxt "#30002"
+msgid "Timeshift"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Enable timeshift"
+msgstr ""
+
+msgctxt "#30004"
+msgid "- Modify inputstream.ffmpegdirect settings..."
+msgstr ""
+
+msgctxt "#30005"
+msgid "Inputstream settings"
+msgstr ""
+
+#empty strings from id 30006 to 30599
+
+msgctxt "#30600"
+msgid "The IP/address of the octonet server. Note that in case of an address, the protocol (http://) has to be omitted."
+msgstr ""
+
+msgctxt "#30601"
+msgid "General settings required by the add-on."
+msgstr ""
+
+msgctxt "#30602"
+msgid "Timeshift settings for pausing/rewinding and fast-forwarding live streams."
+msgstr ""
+
+msgctxt "#30603"
+msgid "Enable the timeshift feature."
+msgstr ""
+
+msgctxt "#30604"
+msgid "Open settings dialog for inputstream.ffmpegdirect for modification of timeshift and other settings."
+msgstr ""

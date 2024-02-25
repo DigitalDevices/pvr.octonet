@@ -439,6 +439,8 @@ OctonetGroup* OctonetData::FindGroup(const std::string& name)
       return &group;
   }
 
+  kodi::Log(ADDON_LOG_ERROR, "Could not find group: %s, in available groups from the server");
+
   return nullptr;
 }
 

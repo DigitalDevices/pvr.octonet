@@ -35,22 +35,16 @@ OctonetData::OctonetData(const std::string& octonetAddress,
     kodi::QueueFormattedNotification(QUEUE_ERROR, kodi::addon::GetLocalizedString(30001).c_str(),
                                      m_channels.size());
 
-  /*
-  // Currently unused, as thread was already present before with
-  // p8platform, by remove of them was it added as C++11 thread way.
   kodi::Log(ADDON_LOG_INFO, "%s Starting separate client update thread...", __func__);
   m_running = true;
   m_thread = std::thread([&] { Process(); });
-  */
 }
 
 OctonetData::~OctonetData(void)
 {
-  /*
   m_running = false;
   if (m_thread.joinable())
     m_thread.join();
-  */
 }
 
 PVR_ERROR OctonetData::GetCapabilities(kodi::addon::PVRCapabilities& capabilities)
@@ -256,7 +250,19 @@ bool OctonetData::LoadEPG(void)
 
 void OctonetData::Process()
 {
-  return;
+  // If we have not loaded EPG prior to a 10 second delay after startup
+  // then request and update from Kodi for each channel
+  std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+
+  if (!m_readInitialEPG)
+  {
+    kodi::Log(ADDON_LOG_INFO, "No request detected from Kodi to load EPG, so requesting now");
+
+    for (const auto& myChannel : m_channels)
+      TriggerEpgUpdate(myChannel.id);
+  }
+
+  m_running = false;
 }
 
 PVR_ERROR OctonetData::GetChannelsAmount(int& amount)
@@ -292,6 +298,8 @@ PVR_ERROR OctonetData::GetEPGForChannel(int channelUid,
                                         time_t end,
                                         kodi::addon::PVREPGTagsResultSet& results)
 {
+  m_readInitialEPG = true;
+
   for (unsigned int i = 0; i < m_channels.size(); i++)
   {
     OctonetChannel& chan = m_channels.at(i);

@@ -97,5 +97,6 @@ private:
   time_t m_lastEpgLoad;
 
   std::atomic<bool> m_running = {false};
+  std::atomic<bool> m_readInitialEPG = {false};
   std::thread m_thread;
 };

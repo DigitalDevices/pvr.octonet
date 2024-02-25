@@ -77,8 +77,6 @@ public:
   void CloseLiveStream() override;
 
 protected:
-  void Process();
-
   const std::string& GetUrl(int id) const;
   const std::string& GetName(int id) const;
 
@@ -95,7 +93,4 @@ private:
   std::vector<OctonetGroup> m_groups;
 
   time_t m_lastEpgLoad;
-
-  std::atomic<bool> m_running = {false};
-  std::thread m_thread;
 };

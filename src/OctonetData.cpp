@@ -34,23 +34,10 @@ OctonetData::OctonetData(const std::string& octonetAddress,
   if (!LoadChannelList())
     kodi::QueueFormattedNotification(QUEUE_ERROR, kodi::addon::GetLocalizedString(30001).c_str(),
                                      m_channels.size());
-
-  /*
-  // Currently unused, as thread was already present before with
-  // p8platform, by remove of them was it added as C++11 thread way.
-  kodi::Log(ADDON_LOG_INFO, "%s Starting separate client update thread...", __func__);
-  m_running = true;
-  m_thread = std::thread([&] { Process(); });
-  */
 }
 
 OctonetData::~OctonetData(void)
 {
-  /*
-  m_running = false;
-  if (m_thread.joinable())
-    m_thread.join();
-  */
 }
 
 PVR_ERROR OctonetData::GetCapabilities(kodi::addon::PVRCapabilities& capabilities)
@@ -256,11 +243,6 @@ bool OctonetData::LoadEPG(void)
 
   m_lastEpgLoad = time(nullptr);
   return true;
-}
-
-void OctonetData::Process()
-{
-  return;
 }
 
 PVR_ERROR OctonetData::GetChannelsAmount(int& amount)

@@ -10,8 +10,6 @@
 
 #include "OctonetData.h"
 
-#include "rtsp_client.hpp"
-
 #include <json/json.h>
 #include <kodi/Filesystem.h>
 #include <kodi/General.h>
@@ -23,10 +21,12 @@
 #endif
 
 OctonetData::OctonetData(const std::string& octonetAddress,
+                         bool enableTimeshift,
                          const kodi::addon::IInstanceInfo& instance)
   : kodi::addon::CInstancePVRClient(instance)
 {
   m_serverAddress = octonetAddress;
+  m_enableTimeshift = enableTimeshift;
   m_channels.clear();
   m_groups.clear();
   m_lastEpgLoad = 0;
@@ -34,23 +34,10 @@ OctonetData::OctonetData(const std::string& octonetAddress,
   if (!LoadChannelList())
     kodi::QueueFormattedNotification(QUEUE_ERROR, kodi::addon::GetLocalizedString(30001).c_str(),
                                      m_channels.size());
-
-  /*
-  // Currently unused, as thread was already present before with
-  // p8platform, by remove of them was it added as C++11 thread way.
-  kodi::Log(ADDON_LOG_INFO, "%s Starting separate client update thread...", __func__);
-  m_running = true;
-  m_thread = std::thread([&] { Process(); });
-  */
 }
 
 OctonetData::~OctonetData(void)
 {
-  /*
-  m_running = false;
-  if (m_thread.joinable())
-    m_thread.join();
-  */
 }
 
 PVR_ERROR OctonetData::GetCapabilities(kodi::addon::PVRCapabilities& capabilities)
@@ -127,9 +114,11 @@ bool OctonetData::LoadChannelList()
   f.Close();
 
   Json::Value root;
-  Json::Reader reader;
+  JSONCPP_STRING err;
+  Json::CharReaderBuilder builder;
+  const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
 
-  if (!reader.parse(jsonContent, root, false))
+  if (!reader->parse(jsonContent.c_str(), jsonContent.c_str() + jsonContent.length(), &root, &err))
     return false;
 
   const Json::Value groupList = root["GroupList"];
@@ -215,9 +204,11 @@ bool OctonetData::LoadEPG(void)
   f.Close();
 
   Json::Value root;
-  Json::Reader reader;
+  JSONCPP_STRING err;
+  Json::CharReaderBuilder builder;
+  const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
 
-  if (!reader.parse(jsonContent, root, false))
+  if (!reader->parse(jsonContent.c_str(), jsonContent.c_str() + jsonContent.length(), &root, &err))
     return false;
 
   const Json::Value eventList = root["EventList"];
@@ -254,11 +245,6 @@ bool OctonetData::LoadEPG(void)
   return true;
 }
 
-void OctonetData::Process()
-{
-  return;
-}
-
 PVR_ERROR OctonetData::GetChannelsAmount(int& amount)
 {
   amount = m_channels.size();
@@ -284,6 +270,25 @@ PVR_ERROR OctonetData::GetChannels(bool radio, kodi::addon::PVRChannelsResultSet
       results.Add(chan);
     }
   }
+  return PVR_ERROR_NO_ERROR;
+}
+
+PVR_ERROR OctonetData::GetChannelStreamProperties(const kodi::addon::PVRChannel& channelinfo, std::vector<kodi::addon::PVRStreamProperty>& properties)
+{
+  properties.emplace_back(PVR_STREAM_PROPERTY_INPUTSTREAM, "inputstream.ffmpegdirect");
+  properties.emplace_back("inputstream.ffmpegdirect.is_realtime_stream", "true");
+  properties.emplace_back("inputstream.ffmpegdirect.open_mode", "ffmpeg");
+  if (m_enableTimeshift)
+  {
+    // This property is required to support timeshifting for Radio channels
+    properties.emplace_back("inputstream-player", "videodefaultplayer");
+    properties.emplace_back("inputstream.ffmpegdirect.stream_mode", "timeshift");
+  }
+  properties.emplace_back(PVR_STREAM_PROPERTY_MIMETYPE, "video/x-mpegts");
+  properties.emplace_back(PVR_STREAM_PROPERTY_STREAMURL, GetUrl(channelinfo.GetUniqueId()));
+
+  kodi::Log(ADDON_LOG_INFO, "Playing channel - name: %s, url: %s, and using inputstream.ffmpegdirect", GetName(channelinfo.GetUniqueId()).c_str(), GetUrl(channelinfo.GetUniqueId()).c_str());
+
   return PVR_ERROR_NO_ERROR;
 }
 
@@ -435,23 +440,8 @@ OctonetGroup* OctonetData::FindGroup(const std::string& name)
       return &group;
   }
 
+  kodi::Log(ADDON_LOG_ERROR, "Could not find group: %s, in available groups from the server");
+
   return nullptr;
 }
 
-/* PVR stream handling */
-/* entirely unused, as we use standard RTSP+TS mux, which can be handlded by
- * Kodi core */
-bool OctonetData::OpenLiveStream(const kodi::addon::PVRChannel& channelinfo)
-{
-  return rtsp_open(GetName(channelinfo.GetUniqueId()), GetUrl(channelinfo.GetUniqueId()));
-}
-
-int OctonetData::ReadLiveStream(unsigned char* pBuffer, unsigned int iBufferSize)
-{
-  return rtsp_read(pBuffer, iBufferSize);
-}
-
-void OctonetData::CloseLiveStream()
-{
-  rtsp_close();
-}

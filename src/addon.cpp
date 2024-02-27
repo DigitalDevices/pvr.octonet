@@ -29,8 +29,9 @@ ADDON_STATUS COctonetAddon::CreateInstance(const kodi::addon::IInstanceInfo& ins
 
     /* IP or hostname of the octonet to be connected to */
     std::string octonetAddress = kodi::addon::GetSettingString("octonetAddress");
+    bool enableTimeshift = kodi::addon::GetSettingBoolean("timeshiftEnabled");
 
-    OctonetData* usedInstance = new OctonetData(octonetAddress, instance);
+    OctonetData* usedInstance = new OctonetData(octonetAddress, enableTimeshift, instance);
     hdl = usedInstance;
 
     m_usedInstances.emplace(instance.GetID(), usedInstance);

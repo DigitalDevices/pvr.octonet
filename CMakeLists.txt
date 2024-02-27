@@ -12,14 +12,10 @@ include_directories(${KODI_INCLUDE_DIR}/.. # Hack way with "/..", need bigger Ko
 set(DEPLIBS ${JSONCPP_LIBRARIES})
 
 set(OCTONET_SOURCES src/addon.cpp
-                    src/OctonetData.cpp
-                    src/Socket.cpp
-                    src/rtsp_client.cpp)
+                    src/OctonetData.cpp)
 
 set(OCTONET_HEADERS src/addon.h
-                    src/OctonetData.h
-                    src/Socket.h
-                    src/rtsp_client.hpp)
+                    src/OctonetData.h)
 
 addon_version(pvr.octonet OCTONET)
 add_definitions(-DOCTONET_VERSION=${OCTONET_VERSION})

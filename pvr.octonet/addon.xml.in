@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.octonet"
-  version="21.0.0"
+  version="21.0.1"
   name="Digital Devices Octopus NET Client"
   provider-name="digitaldevices">
   <requires>@ADDON_DEPENDS@
-    <import addon="inputstream.ffmpegdirect" minversion="21.0.0"/>
+    <import addon="inputstream.ffmpegdirect" minversion="21.0.1"/>
   </requires>
   <extension
     point="kodi.pvrclient"
@@ -15,6 +15,10 @@
     <license>GPL-2.0-or-later</license>
     <source>https://github.com/DigitalDevices/pvr.octonet</source>
     <news>
+v21.0.1
+- Translations updates from Weblate
+	- en_gb
+
     </news>
     <summary lang="de_DE">Kodi PVR Addon für Digital Devices Octopus NET Streams</summary>
     <summary lang="en_GB">Kodi PVR Addon for Digital Devices Octopus NET Streams</summary>

@@ -2,8 +2,8 @@
 Digital Devices [Octonet](http://www.digital-devices.eu/shop/de/netzwerk-tv/) PVR client addon for [Kodi](http://kodi.tv)
 
 [![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL%20v2+-blue.svg)](LICENSE.md)
-[![Build and run tests](https://github.com/DigitalDevices/pvr.octonet/actions/workflows/build.yml/badge.svg?branch=Omega)](https://github.com/DigitalDevices/pvr.octonet/actions/workflows/build.yml)
-[![Build Status](https://jenkins.kodi.tv/view/Addons/job/DigitalDevices/job/pvr.octonet/job/Omega/badge/icon)](https://jenkins.kodi.tv/blue/organizations/jenkins/DigitalDevices%2Fpvr.octonet/branches/)
+[![Build and run tests](https://github.com/DigitalDevices/pvr.octonet/actions/workflows/build.yml/badge.svg?branch=Piers)](https://github.com/DigitalDevices/pvr.octonet/actions/workflows/build.yml)
+[![Build Status](https://jenkins.kodi.tv/view/Addons/job/DigitalDevices/job/pvr.octonet/job/Piers/badge/icon)](https://jenkins.kodi.tv/blue/organizations/jenkins/DigitalDevices%2Fpvr.octonet/branches/)
 
 # Building
 

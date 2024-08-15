@@ -67,7 +67,9 @@ public:
   PVR_ERROR GetChannelGroups(bool radio, kodi::addon::PVRChannelGroupsResultSet& results) override;
   PVR_ERROR GetChannelGroupMembers(const kodi::addon::PVRChannelGroup& group,
                                    kodi::addon::PVRChannelGroupMembersResultSet& results) override;
-  PVR_ERROR GetChannelStreamProperties(const kodi::addon::PVRChannel& channel, std::vector<kodi::addon::PVRStreamProperty>& properties) override;
+  PVR_ERROR GetChannelStreamProperties(const kodi::addon::PVRChannel& channel,
+                                       PVR_SOURCE source,
+                                       std::vector<kodi::addon::PVRStreamProperty>& properties) override;
 
   PVR_ERROR GetEPGForChannel(int channelUid,
                              time_t start,

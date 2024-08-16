@@ -273,7 +273,7 @@ PVR_ERROR OctonetData::GetChannels(bool radio, kodi::addon::PVRChannelsResultSet
   return PVR_ERROR_NO_ERROR;
 }
 
-PVR_ERROR OctonetData::GetChannelStreamProperties(const kodi::addon::PVRChannel& channelinfo, std::vector<kodi::addon::PVRStreamProperty>& properties)
+PVR_ERROR OctonetData::GetChannelStreamProperties(const kodi::addon::PVRChannel& channelinfo, PVR_SOURCE source, std::vector<kodi::addon::PVRStreamProperty>& properties)
 {
   properties.emplace_back(PVR_STREAM_PROPERTY_INPUTSTREAM, "inputstream.ffmpegdirect");
   properties.emplace_back("inputstream.ffmpegdirect.is_realtime_stream", "true");

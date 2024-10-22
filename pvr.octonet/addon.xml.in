@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="pvr.octonet"
-  version="22.1.0"
+  version="22.2.0"
   name="Digital Devices Octopus NET Client"
   provider-name="digitaldevices">
   <requires>@ADDON_DEPENDS@
